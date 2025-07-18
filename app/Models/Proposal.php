@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Kabupaten;
+use App\Models\Kecamatan;
 
 class Proposal extends Model
 {
@@ -50,6 +52,16 @@ class Proposal extends Model
     public function kabupatenTujuan()
     {
         return $this->belongsTo(Kabupaten::class, 'kabupaten_tujuan_id');
+    }
+
+    public function evaluations()
+    {
+        return $this->hasMany(ProposalEvaluation::class);
+    }
+
+    public function jenisProposal()
+    {
+        return $this->belongsTo(JenisProposal::class);
     }
 
 }

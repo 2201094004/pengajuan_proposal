@@ -2,28 +2,68 @@
 
 @section('content')
 <div class="container">
-    <div class="card shadow-sm mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h6 class="m-0">Status Pengajuan Proposal</h6>
+    <div class="card shadow-sm mb-4" data-aos="fade-up">
+        {{-- HEADER --}}
+        <div class="card-header bg-white d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+            <h5 class="mb-2 mb-md-0">Status Pengajuan Proposal</h5>
+
+            {{-- Filter kabupaten --}}
+            <div class="col-md-4">
+                <label for="kabupaten_id" class="form-label">Filter Kabupaten</label>
+                <select name="kabupaten_id" id="kabupaten_id" class="form-select">
+                    <option value="">-- Semua Kabupaten --</option>
+                    @foreach($kabupatens as $kab)
+                        <option value="{{ $kab->id }}" {{ request('kabupaten_id') == $kab->id ? 'selected' : '' }}>
+                            {{ $kab->nama }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            {{-- Form Export --}}
+            <form action="#" method="GET" class="d-flex align-items-center">
+                {{-- dropdown rentang waktu --}}
+                <select name="range" class="form-select form-select-sm me-2" style="max-width: 180px;">
+                    <option value="daily"  {{ request('range') == 'daily'  ? 'selected' : '' }}>Harian</option>
+                    <option value="weekly" {{ request('range') == 'weekly' ? 'selected' : '' }}>Mingguan</option>
+                    <option value="monthly" {{ request('range') == 'monthly'? 'selected' : '' }}>Bulanan</option>
+                    <option value="yearly"  {{ request('range') == 'yearly' ? 'selected' : '' }}>Tahunan</option>
+                </select>
+
+                {{-- Tombol Excel --}}
+                <a href="{{ route('admin.proposals.export.excel', ['range' => request('range','daily'), 'search' => request('search')]) }}"
+                   class="btn btn-sm btn-success me-2">
+                    <i class="fas fa-file-excel"></i> Export Excel
+                </a>
+
+                {{-- Tombol PDF --}}
+                <a href="{{ route('admin.proposals.export.pdf', ['range' => request('range','daily'), 'search' => request('search')]) }}"
+                   class="btn btn-sm btn-danger">
+                    <i class="fas fa-file-pdf"></i> Export PDF
+                </a>
+            </form>
         </div>
 
         <div class="card-body">
-
-            <!-- Form Pencarian -->
-            <form method="GET" action="{{ route('admin.status-pengajuan') }}" class="mb-3">
+            {{-- FORM PENCARIAN --}}
+            <form method="GET" action="{{ route('admin.status-pengajuan') }}" class="mb-4">
                 <div class="input-group">
-                    <input type="text" name="search" class="form-control" placeholder="Cari nama atau judul..." value="{{ request('search') }}">
+                    <input type="text" name="search" class="form-control"
+                           placeholder="Cari nama atau judul..." value="{{ request('search') }}">
                     <button class="btn btn-outline-secondary" type="submit">Cari</button>
                 </div>
             </form>
 
+            {{-- TABEL PROPOSAL --}}
             <div class="table-responsive">
-                <table class="table table-bordered align-middle">
-                    <thead class="table-light text-center">
+                <table class="table table-bordered table-hover align-middle text-center">
+                    <thead class="table-light">
                         <tr>
                             <th>Nama</th>
                             <th>Judul</th>
-                            <th>Kab/Kec/Desa</th>
+                            <th>Asal (Kab/Kec/Desa)</th>
+                            <th>Tujuan</th>
+                            <th>Jenis</th>
                             <th>Status</th>
                             <th>Dokumen</th>
                             <th>Aksi</th>
@@ -35,36 +75,48 @@
                                 <td>{{ $proposal->nama }}</td>
                                 <td>{{ $proposal->title }}</td>
                                 <td>
-                                    {{ $proposal->kabupaten->nama ?? '-' }} <br>
-                                    <small>{{ $proposal->kecamatan->nama ?? '-' }} / {{ $proposal->desa->nama ?? '-' }}</small>
+                                    {{ optional($proposal->kabupaten)->nama ?? '-' }}<br>
+                                    <small>{{ optional($proposal->kecamatan)->nama ?? '-' }}
+                                           / {{ optional($proposal->desa)->nama ?? '-' }}</small>
                                 </td>
-                                <td class="text-center">
+                                <td>{{ optional($proposal->kabupatenTujuan)->nama ?? '-' }}</td>
+                                <td>{{ optional($proposal->jenisProposal)->nama ?? '-' }}</td>
+                                <td>
                                     @switch($proposal->status)
-                                        @case('draft') <span class="badge bg-warning text-dark">Draft</span> @break
-                                        @case('submitted') <span class="badge bg-primary">Dikirim</span> @break
-                                        @case('accepted') <span class="badge bg-success">Diterima</span> @break
-                                        @case('rejected') <span class="badge bg-danger">Ditolak</span> @break
-                                        @case('revised') <span class="badge bg-info text-dark">Revisi</span> @break
-                                        @default <span class="badge bg-secondary">-</span>
+                                        @case('draft')     <span class="badge bg-warning text-dark">Draft</span> @break
+                                        @case('submitted') <span class="badge bg-primary">Dikirim</span>         @break
+                                        @case('accepted')  <span class="badge bg-success">Diterima</span>        @break
+                                        @case('rejected')  <span class="badge bg-danger">Ditolak</span>         @break
+                                        @case('revised')   <span class="badge bg-info text-dark">Revisi</span>   @break
+                                        @default           <span class="badge bg-secondary">-</span>
                                     @endswitch
                                 </td>
-                                <td class="text-center">
-                                    @if($proposal->document)
-                                        <a href="{{ asset('storage/documents/' . $proposal->document) }}" target="_blank" class="btn btn-sm btn-outline-secondary">Lihat</a>
+                                <td>
+                                    @if($proposal->proposal_file)
+                                        <a href="{{ asset('storage/documents/'.$proposal->proposal_file) }}"
+                                           target="_blank" class="btn btn-sm btn-outline-secondary">
+                                           Lihat
+                                        </a>
                                     @else
                                         <span class="text-muted">-</span>
                                     @endif
                                 </td>
-                                <td class="text-center">
-                                    @if($proposal->status == 'submitted')
-                                        <form action="{{ route('admin.proposal.accept', $proposal->id) }}" method="POST" class="d-inline">@csrf
-                                            <button class="btn btn-success btn-sm">Terima</button>
+                                <td>
+                                    <a href="{{ route('proposals.show', $proposal->id) }}"
+                                       class="btn btn-sm btn-info mb-1">Detail</a>
+
+                                    @if($proposal->status === 'submitted')
+                                        <form action="{{ route('admin.proposal.accept', $proposal->id) }}"
+                                              method="POST" class="d-inline">@csrf
+                                            <button class="btn btn-sm btn-success">✓ Terima</button>
                                         </form>
-                                        <form action="{{ route('admin.proposal.reject', $proposal->id) }}" method="POST" class="d-inline">@csrf
-                                            <button class="btn btn-danger btn-sm">Tolak</button>
+                                        <form action="{{ route('admin.proposal.reject', $proposal->id) }}"
+                                              method="POST" class="d-inline">@csrf
+                                            <button class="btn btn-sm btn-danger">× Tolak</button>
                                         </form>
-                                        <form action="{{ route('admin.proposal.revision', $proposal->id) }}" method="POST" class="d-inline">@csrf
-                                            <button class="btn btn-warning btn-sm">Revisi</button>
+                                        <form action="{{ route('admin.proposal.revision', $proposal->id) }}"
+                                              method="POST" class="d-inline">@csrf
+                                            <button class="btn btn-sm btn-warning">↺ Revisi</button>
                                         </form>
                                     @else
                                         <span class="text-muted">-</span>
@@ -72,12 +124,13 @@
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="6" class="text-center text-muted">Belum ada pengajuan proposal.</td></tr>
+                            <tr>
+                                <td colspan="8" class="text-center text-muted">Belum ada pengajuan proposal.</td>
+                            </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
-
         </div>
     </div>
 </div>

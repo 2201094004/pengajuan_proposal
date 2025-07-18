@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Proposal;
 use App\Models\User;
+use App\Models\Kabupaten;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
@@ -39,21 +40,40 @@ class AdminController extends Controller
 
     // Menampilkan daftar proposal dengan pencarian
     public function statusPengajuan(Request $request)
-    {
-        $query = Proposal::query()->with(['kabupaten', 'kecamatan', 'desa']);
+{
+    $query = Proposal::query()->with(['kabupaten', 'kecamatan', 'desa', 'kabupatenTujuan', 'jenisProposal']);
 
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('nama', 'like', "%{$search}%")
-                    ->orWhere('title', 'like', "%{$search}%");
-            });
-        }
-
-        $proposals = $query->latest()->get();
-
-        return view('admin.status-pengajuan', compact('proposals'));
+    // Pencarian berdasarkan nama atau judul
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->where(function ($q) use ($search) {
+            $q->where('nama', 'like', "%{$search}%")
+              ->orWhere('title', 'like', "%{$search}%");
+        });
     }
+
+    // Filter berdasarkan kabupaten
+    if ($request->filled('kabupaten_id')) {
+        $query->where('kabupaten_id', $request->kabupaten_id);
+    }
+
+    // Filter waktu
+    if ($request->filled('range')) {
+        match ($request->range) {
+            'daily'   => $query->whereDate('created_at', today()),
+            'weekly'  => $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]),
+            'monthly' => $query->whereMonth('created_at', now()->month),
+            'yearly'  => $query->whereYear('created_at', now()->year),
+            default   => null,
+        };
+    }
+
+    $proposals  = $query->latest()->get();
+    $kabupatens = Kabupaten::all(); // ⬅️ ini penting
+
+    return view('admin.status-pengajuan', compact('proposals', 'kabupatens'));
+}
+
 
     // Menerima proposal
     public function acceptProposal($id)

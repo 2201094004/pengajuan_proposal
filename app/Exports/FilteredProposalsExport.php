@@ -2,33 +2,35 @@
 
 namespace App\Exports;
 
-use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithStyles;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class FilteredProposalsExport implements FromCollection, WithHeadings, WithStyles
+class FilteredProposalsExport implements FromCollection, WithHeadings
 {
     protected $proposals;
 
-    public function __construct($proposals)
+    public function __construct(Collection $proposals)
     {
         $this->proposals = $proposals;
     }
 
     public function collection()
     {
-        return $this->proposals->map(function ($proposal) {
+        return $this->proposals->map(function ($p) {
             return [
-                'ID' => $proposal->id,
-                'Judul Proposal' => $proposal->title,
-                'Email' => $proposal->email,
-                'No HP' => $proposal->no_hp,
-                'No Rekening' => $proposal->no_rekening,
-                'Status' => ucfirst($proposal->status),
-                'Tanggal Dibuat' => $proposal->created_at->format('Y-m-d'),
-                'Tanggal Diperbarui' => $proposal->updated_at->format('Y-m-d H:i:s'),
+                'Nama' => $p->nama,
+                'Judul' => $p->title,
+                'Email' => $p->email,
+                'No HP' => $p->no_hp,
+                'No Rekening' => $p->no_rekening,
+                'Alamat' => $p->alamat,
+                'Kabupaten' => optional($p->kabupaten)->nama,
+                'Kecamatan' => optional($p->kecamatan)->nama,
+                'Desa' => optional($p->desa)->nama,
+                'Kabupaten Tujuan' => $p->kabupaten_tujuan ?? '-',
+                'Status' => ucfirst($p->status),
+                'Tanggal' => $p->created_at->format('d-m-Y'),
             ];
         });
     }
@@ -36,37 +38,18 @@ class FilteredProposalsExport implements FromCollection, WithHeadings, WithStyle
     public function headings(): array
     {
         return [
-            'ID',
-            'Judul Proposal',
+            'Nama',
+            'Judul',
             'Email',
             'No HP',
             'No Rekening',
+            'Alamat',
+            'Kabupaten',
+            'Kecamatan',
+            'Desa',
+            'Kabupaten Tujuan',
             'Status',
-            'Tanggal Dibuat',
-            'Tanggal Diperbarui',
+            'Tanggal',
         ];
-    }
-
-    public function styles(Worksheet $sheet)
-    {
-        $rowCount = $this->proposals->count() + 1; // +1 for header row
-
-        $sheet->getStyle('A1:H' . $rowCount)->applyFromArray([
-            'borders' => [
-                'allBorders' => [
-                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
-                    'color' => ['argb' => '000000'],
-                ],
-            ],
-            'font' => [
-                'name' => 'Calibri',
-                'size' => 11,
-            ],
-        ]);
-
-        // Bold header row
-        $sheet->getStyle('A1:H1')->getFont()->setBold(true);
-
-        return [];
     }
 }

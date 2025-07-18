@@ -15,8 +15,13 @@ use App\Http\Controllers\KecamatanController;
 use App\Http\Controllers\DesaController;
 use App\Http\Controllers\StakeholderController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\JenisProposalController;
 
 // ===================== HALAMAN UTAMA =====================
+Route::get('/', function () {
+    return view('welcome');
+});
+
 Route::get('/landing', function () {
     return view('welcome');
 });
@@ -113,3 +118,26 @@ Route::get('/admin/contacts', [ContactController::class, 'index'])
     ->middleware(['auth', 'isAdmin'])
     ->name('admin.contacts.index');
 
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::resource('jenis-proposals', JenisProposalController::class);
+});
+
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
+    Route::get('/status-pengajuan', [AdminController::class, 'statusPengajuan'])->name('admin.status-pengajuan');
+    Route::get('/export/proposals', [ProposalController::class, 'exportFiltered'])->name('admin.proposals.export');
+    Route::get('/admin/export/proposals',       [ProposalController::class, 'exportFiltered'])->name('admin.proposals.export.excel');
+    Route::get('/admin/export/proposals/pdf',   [ProposalController::class, 'exportPdf'])->name('admin.proposals.export.pdf');
+});
+
+Route::middleware(['auth','role:stakeholder,admin'])
+      ->prefix('stakeholder')
+      ->group(function () {
+
+    // daftar semua proposal (boleh pakai controller yang sama dengan admin)
+    Route::get('/proposals', [AdminController::class, 'statusPengajuan'])
+        ->name('stakeholder.proposals');
+
+    // status pengajuan (bisa re‑use method yg sama)
+    Route::get('/status-pengajuan', [AdminController::class, 'statusPengajuan'])
+        ->name('stakeholder.status-pengajuan');
+});

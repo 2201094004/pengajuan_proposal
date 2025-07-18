@@ -2,15 +2,15 @@
 
 @section('content')
 <div class="container">
-    <div class="card shadow-sm mb-4" id="proposal-table" data-aos="fade-up">
+    <div class="card shadow-sm mb-4" data-aos="fade-up">
         <div class="card-header bg-white d-flex justify-content-between align-items-center">
             <h6 class="m-0">Daftar Proposal Anda</h6>
             <a href="{{ route('proposals.create') }}" class="btn btn-sm btn-primary">+ Buat Proposal Baru</a>
         </div>
 
         <div class="card-body table-responsive">
-            <table id="proposalTable" class="table table-bordered table-hover align-middle display nowrap" style="width:100%">
-                <thead class="table-light text-center">
+            <table id="proposalTable" class="table table-bordered table-hover align-middle text-center display nowrap" style="width:100%">
+                <thead class="table-light">
                     <tr>
                         <th>Nama</th>
                         <th>Judul</th>
@@ -20,6 +20,7 @@
                         <th>Alamat</th>
                         <th>Asal (Kab/Kec/Desa)</th>
                         <th>Tujuan Kabupaten</th>
+                        <th>Jenis Proposal</th>
                         <th>Status</th>
                         <th>Dokumen</th>
                         <th>Aksi</th>
@@ -34,61 +35,48 @@
                             <td>{{ $proposal->no_hp }}</td>
                             <td>{{ $proposal->no_rekening }}</td>
                             <td>{{ $proposal->alamat }}</td>
-                            <td>{{ $proposal->kabupaten->nama ?? '-' }}</td>
                             <td>
-                                {{ $proposal->kecamatan->nama ?? '-' }} /
-                                {{ $proposal->desa->nama ?? '-' }}
+                                {{ $proposal->kabupaten->nama ?? '-' }}<br>
+                                <small>{{ $proposal->kecamatan->nama ?? '-' }} / {{ $proposal->desa->nama ?? '-' }}</small>
                             </td>
                             <td>{{ $proposal->kabupatenTujuan->nama ?? '-' }}</td>
-                            <td class="text-center">
+                            <td>{{ $proposal->jenisProposal->nama ?? '-' }}</td>
+                            <td>
                                 @switch($proposal->status)
-                                    @case('draft')
-                                        <span class="badge bg-warning text-dark">Draft</span>
-                                        @break
-                                    @case('submitted')
-                                        <span class="badge bg-primary">Dikirim</span>
-                                        @break
-                                    @case('accepted')
-                                        <span class="badge bg-success">Diterima</span>
-                                        @break
-                                    @case('rejected')
-                                        <span class="badge bg-danger">Ditolak</span>
-                                        @break
-                                    @case('revised')
-                                        <span class="badge bg-info text-dark">Revisi</span>
-                                        @break
-                                    @default
-                                        <span class="badge bg-secondary">Tidak Diketahui</span>
+                                    @case('draft') <span class="badge bg-warning text-dark">Draft</span> @break
+                                    @case('submitted') <span class="badge bg-primary">Dikirim</span> @break
+                                    @case('accepted') <span class="badge bg-success">Diterima</span> @break
+                                    @case('rejected') <span class="badge bg-danger">Ditolak</span> @break
+                                    @case('revised') <span class="badge bg-info text-dark">Revisi</span> @break
+                                    @default <span class="badge bg-secondary">-</span>
                                 @endswitch
                             </td>
-                            <td class="text-center">
+                            <td>
                                 @if($proposal->proposal_file)
-                                    <a href="{{ asset('storage/documents/' . $proposal->proposal_file) }}" target="_blank" class="btn btn-outline-secondary btn-sm">
-                                        <i class="bx bx-file"></i> Lihat
-                                    </a>
+                                    <a href="{{ asset('storage/documents/' . $proposal->proposal_file) }}" target="_blank" class="btn btn-sm btn-outline-secondary">Lihat</a>
                                 @else
                                     <span class="text-muted">-</span>
                                 @endif
                             </td>
-                            <td class="text-center">
+                            <td>
+                                <a href="{{ route('proposals.show', $proposal->id) }}" class="btn btn-info btn-sm">Lihat</a>
+                                
                                 @if($proposal->status == 'draft')
-                                    <form action="{{ route('proposals.submit', $proposal->id) }}" method="POST" class="d-inline">
-                                        @csrf
+                                    <form action="{{ route('proposals.submit', $proposal->id) }}" method="POST" class="d-inline">@csrf
                                         <button type="submit" class="btn btn-success btn-sm">Submit</button>
                                     </form>
                                 @endif
+                                
                                 <a href="{{ route('proposals.edit', $proposal->id) }}" class="btn btn-warning btn-sm">Edit</a>
+                                
                                 <form action="{{ route('proposals.destroy', $proposal->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus proposal ini?')">
-                                    @csrf
-                                    @method('DELETE')
+                                    @csrf @method('DELETE')
                                     <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
                                 </form>
                             </td>
                         </tr>
                     @empty
-                        <tr>
-                            <td colspan="11" class="text-center text-muted">Belum ada proposal yang dibuat.</td>
-                        </tr>
+                        <tr><td colspan="12" class="text-center text-muted">Belum ada proposal yang dibuat.</td></tr>
                     @endforelse
                 </tbody>
             </table>

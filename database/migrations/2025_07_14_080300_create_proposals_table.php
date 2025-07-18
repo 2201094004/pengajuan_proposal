@@ -35,7 +35,6 @@ return new class extends Migration
             $table->unsignedBigInteger('kabupaten_tujuan_id');
             $table->foreign('kabupaten_tujuan_id')->references('id')->on('kabupatens');
 
-
             // Dokumen proposal & form penilaian auto
             $table->string('proposal_file')->nullable(); // ganti dari 'document'
             $table->string('form_penilaian_auto')->nullable();

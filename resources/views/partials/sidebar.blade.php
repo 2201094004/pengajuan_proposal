@@ -33,6 +33,11 @@
                 <i class="fas fa-user me-2"></i> Profile
             </a>
 
+            <a href="{{ route('jenis-proposals.index') }}" 
+                class="list-group-item list-group-item-action {{ request()->is('jenis-proposals*') ? 'active' : '' }}">
+                <i class="fas fa-folder me-2"></i> Jenis Proposal
+            </a>
+
             <a href="{{ route('proposals.index') }}" 
                class="list-group-item list-group-item-action {{ request()->is('admin/proposals') ? 'active' : '' }}">
                <i class="fas fa-book me-2"></i> Semua Proposal
@@ -43,7 +48,7 @@
                 <i class="fas fa-check-circle me-2"></i> Status Pengajuan
             </a>
 
-             <a href="{{ route('stakeholder.evaluate') }}" 
+             {{-- <a href="{{ route('stakeholder.evaluate') }}" 
                class="list-group-item list-group-item-action {{ request()->is('stakeholder/evaluate*') ? 'active' : '' }}">
                 <i class="fas fa-tasks me-2"></i> Evaluasi Proposal
             </a>
@@ -51,16 +56,11 @@
             <a href="{{ route('stakeholder.history') }}" 
                class="list-group-item list-group-item-action {{ request()->is('stakeholder/history*') ? 'active' : '' }}">
                 <i class="fas fa-history me-2"></i> Riwayat Evaluasi
-            </a>
+            </a> --}}
 
             <a href="{{ route('admin.contacts.index') }}" 
                 class="list-group-item list-group-item-action {{ request()->is('admin/contacts*') ? 'active' : '' }}">
                 <i class="fas fa-envelope me-2"></i> Pesan Masuk
-            </a>
-
-            <a href="{{ route('admin.manage-users') }}" 
-               class="list-group-item list-group-item-action {{ request()->is('admin/users*') ? 'active' : '' }}">
-                <i class="fas fa-users me-2"></i> Manajemen Pengguna
             </a>
 
             <a href="{{ route('kabupatens.index') }}" 
@@ -77,6 +77,11 @@
                class="list-group-item list-group-item-action {{ request()->is('desas*') ? 'active' : '' }}">
                 <i class="fas fa-map-pin me-2"></i> Desa
             </a>
+
+            <a href="{{ route('admin.manage-users') }}" 
+               class="list-group-item list-group-item-action {{ request()->is('admin/users*') ? 'active' : '' }}">
+                <i class="fas fa-users me-2"></i> Manajemen Pengguna
+            </a>
         @endif
 
         {{-- Sidebar untuk Stakeholder --}}
@@ -91,7 +96,9 @@
                 <i class="fas fa-user me-2"></i> Profile
             </a>
 
-            <a href="{{ route('stakeholder.evaluate') }}" 
+            
+
+            {{-- <a href="{{ route('stakeholder.evaluate') }}" 
                class="list-group-item list-group-item-action {{ request()->is('stakeholder/evaluate*') ? 'active' : '' }}">
                 <i class="fas fa-tasks me-2"></i> Evaluasi Proposal
             </a>
@@ -99,16 +106,16 @@
             <a href="{{ route('stakeholder.history') }}" 
                class="list-group-item list-group-item-action {{ request()->is('stakeholder/history*') ? 'active' : '' }}">
                 <i class="fas fa-history me-2"></i> Riwayat Evaluasi
-            </a>
+            </a> --}}
         @endif
 
         {{-- Logout --}}
-        <form method="POST" action="{{ route('logout') }}">
+        {{-- <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit" class="list-group-item list-group-item-action text-start">
                 <i class="fas fa-sign-out-alt me-2"></i> Logout
             </button>
-        </form>
+        </form> --}}
 
     </div>
 </div>
