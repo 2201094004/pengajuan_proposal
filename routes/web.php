@@ -17,47 +17,69 @@ use App\Http\Controllers\StakeholderController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\JenisProposalController;
 
-// ===================== HALAMAN UTAMA =====================
-Route::get('/', function () {
-    return view('welcome');
-});
+/*
+|--------------------------------------------------------------------------
+| HALAMAN UMUM
+|--------------------------------------------------------------------------
+*/
 
-Route::get('/landing', function () {
-    return view('welcome');
-});
+Route::get('/', fn() => view('welcome'));
+Route::get('/landing', fn() => view('welcome'));
 
-// ===================== LOGIN / REGISTER =====================
+/*
+|--------------------------------------------------------------------------
+| LOGIN & REGISTER
+|--------------------------------------------------------------------------
+*/
+
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
 
-Auth::routes(); // untuk logout, forgot password, dll
+Auth::routes(); // Termasuk logout, lupa password, dll
 
-// ===================== HALAMAN SETELAH LOGIN =====================
+/*
+|--------------------------------------------------------------------------
+| HALAMAN SETELAH LOGIN
+|--------------------------------------------------------------------------
+*/
+
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
-// ===================== PROFIL (semua role) =====================
+/*
+|--------------------------------------------------------------------------
+| PROFIL (Semua Role)
+|--------------------------------------------------------------------------
+*/
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile/edit', [ProfileController::class, 'update'])->name('profile.update');
 });
 
-// ===================== ADMIN =====================
+/*
+|--------------------------------------------------------------------------
+| ADMIN
+|--------------------------------------------------------------------------
+*/
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
-    // Dashboard admin (statistik & diagram proposal)
-    Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    // Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/', [DashboardController::class, 'admin'])->name('admin.dashboard');
+    
 
-    // Status pengajuan proposal
+    // Status Pengajuan Proposal
     Route::get('/status-pengajuan', [AdminController::class, 'statusPengajuan'])->name('admin.status-pengajuan');
 
-    // Aksi proposal
+    // Aksi Proposal (terima/tolak/revisi)
     Route::post('/proposals/{id}/accept', [AdminController::class, 'acceptProposal'])->name('admin.proposal.accept');
     Route::post('/proposals/{id}/reject', [AdminController::class, 'rejectProposal'])->name('admin.proposal.reject');
     Route::post('/proposals/{id}/revision', [AdminController::class, 'revisionProposal'])->name('admin.proposal.revision');
 
-    // Manajemen user
+    // Lembar Penilaian
+    Route::get('/proposals/{id}/penilaian', [ProposalController::class, 'penilaian'])->name('admin.proposals.penilaian');
+
+    // Manajemen Pengguna
     Route::get('/users', [AdminController::class, 'manageUsers'])->name('admin.manage-users');
     Route::get('/users/create', [AdminController::class, 'createUser'])->name('admin.create-user');
     Route::post('/users', [AdminController::class, 'storeUser'])->name('admin.store-user');
@@ -65,30 +87,62 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::put('/users/{id}', [AdminController::class, 'updateUser'])->name('admin.update-user');
     Route::delete('/users/{id}', [AdminController::class, 'deleteUser'])->name('admin.delete-user');
 
-    // Ekspor data proposal (daily, weekly, monthly, yearly)
-    Route::get('/proposals/export', [AdminController::class, 'exportProposals'])->name('proposals.export');
-    
+    // Jenis Proposal
+    Route::resource('jenis-proposals', JenisProposalController::class);
+
+    // Ekspor
+    Route::get('/export/proposals', [ProposalController::class, 'exportFiltered'])->name('admin.proposals.export');
+    Route::get('/export/proposals/excel', [ProposalController::class, 'exportFilteredExcel'])->name('admin.proposals.export.excel');
+    Route::get('/export/proposals/pdf', [ProposalController::class, 'exportPdf'])->name('admin.proposals.export.pdf');
+
+    // Master Data
+    Route::resource('kabupatens', KabupatenController::class);
+    Route::resource('kecamatans', KecamatanController::class);
+    Route::resource('desas', DesaController::class);
+
+    // Lihat pesan
+    Route::get('/contacts', [ContactController::class, 'index'])->name('admin.contacts.index');
 });
 
-// ===================== MASYARAKAT =====================
+/*
+|--------------------------------------------------------------------------
+| MASYARAKAT
+|--------------------------------------------------------------------------
+*/
 Route::middleware(['auth', 'role:masyarakat'])->prefix('masyarakat')->group(function () {
     Route::get('/', [DashboardController::class, 'masyarakat'])->name('masyarakat.dashboard');
 });
 
-// ===================== STAKEHOLDER =====================
-Route::middleware(['auth', 'role:stakeholder,admin'])->group(function () {
+/*
+|--------------------------------------------------------------------------
+| STAKEHOLDER & ADMIN (Evaluasi Proposal)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:stakeholder,admin'])->prefix('stakeholder')->group(function () {
     Route::get('/', [StakeholderController::class, 'dashboard'])->name('stakeholder.dashboard');
 
-    // Evaluasi proposal
+    // Form Penilaian
     Route::get('/evaluate/{id}', [StakeholderController::class, 'evaluateForm'])->name('stakeholder.evaluate.form');
     Route::post('/evaluate/{id}', [StakeholderController::class, 'evaluateStore'])->name('stakeholder.evaluate.store');
 
-    // Lihat daftar dan riwayat evaluasi
+    // List Evaluasi & History
     Route::get('/evaluate', [StakeholderController::class, 'evaluateList'])->name('stakeholder.evaluate');
     Route::get('/history', [StakeholderController::class, 'history'])->name('stakeholder.history');
+
+    // Melihat status pengajuan
+    Route::get('/status-pengajuan', [AdminController::class, 'statusPengajuan'])->name('stakeholder.status-pengajuan');
+    Route::get('/proposals', [AdminController::class, 'statusPengajuan'])->name('stakeholder.proposals');
+
+    // Export oleh stakeholder
+    Route::get('/export/proposals/excel', [ProposalController::class, 'exportFilteredExcel'])->name('stakeholder.proposals.export.excel');
+    Route::get('/export/proposals/pdf', [ProposalController::class, 'exportPdf'])->name('stakeholder.proposals.export.pdf');
 });
 
-// ===================== PROPOSAL (untuk semua user login) =====================
+/*
+|--------------------------------------------------------------------------
+| PROPOSAL (Untuk Semua Role Login)
+|--------------------------------------------------------------------------
+*/
 Route::middleware(['auth'])->group(function () {
     Route::get('proposals', [ProposalController::class, 'index'])->name('proposals.index');
     Route::get('proposals/create', [ProposalController::class, 'create'])->name('proposals.create');
@@ -99,45 +153,13 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('proposals/{id}', [ProposalController::class, 'destroy'])->name('proposals.destroy');
     Route::post('proposals/{id}/submit', [ProposalController::class, 'submit'])->name('proposals.submit');
 
-    // Ekspor proposal berdasarkan filter waktu
+    // Ekspor umum
     Route::get('/proposals/export/filtered', [ProposalExportController::class, 'exportFiltered'])->name('proposals.export.filtered');
 });
 
-// ===================== MASTER DATA (ADMIN) =====================
-Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::resource('kabupatens', KabupatenController::class);
-    Route::resource('kecamatans', KecamatanController::class);
-    Route::resource('desas', DesaController::class);
-});
-
-// Form Contact Us (halaman depan)
+/*
+|--------------------------------------------------------------------------
+| FORM KONTAK (Publik)
+|--------------------------------------------------------------------------
+*/
 Route::post('/contact', [ContactController::class, 'store'])->name('contacts.store');
-
-// Halaman admin melihat pesan (hanya untuk admin)
-Route::get('/admin/contacts', [ContactController::class, 'index'])
-    ->middleware(['auth', 'isAdmin'])
-    ->name('admin.contacts.index');
-
-Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::resource('jenis-proposals', JenisProposalController::class);
-});
-
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
-    Route::get('/status-pengajuan', [AdminController::class, 'statusPengajuan'])->name('admin.status-pengajuan');
-    Route::get('/export/proposals', [ProposalController::class, 'exportFiltered'])->name('admin.proposals.export');
-    Route::get('/admin/export/proposals',       [ProposalController::class, 'exportFiltered'])->name('admin.proposals.export.excel');
-    Route::get('/admin/export/proposals/pdf',   [ProposalController::class, 'exportPdf'])->name('admin.proposals.export.pdf');
-});
-
-Route::middleware(['auth','role:stakeholder,admin'])
-      ->prefix('stakeholder')
-      ->group(function () {
-
-    // daftar semua proposal (boleh pakai controller yang sama dengan admin)
-    Route::get('/proposals', [AdminController::class, 'statusPengajuan'])
-        ->name('stakeholder.proposals');
-
-    // status pengajuan (bisa re‑use method yg sama)
-    Route::get('/status-pengajuan', [AdminController::class, 'statusPengajuan'])
-        ->name('stakeholder.status-pengajuan');
-});

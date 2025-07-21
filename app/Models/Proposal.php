@@ -23,7 +23,7 @@ class Proposal extends Model
         'kabupaten_id',
         'kecamatan_id',
         'desa_id',
-        'kabupaten_tujuan',
+        'kabupaten_tujuan_id',
         'proposal_file',
         'form_penilaian_auto',
         'status',

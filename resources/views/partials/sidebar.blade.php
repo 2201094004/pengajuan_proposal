@@ -96,7 +96,16 @@
                 <i class="fas fa-user me-2"></i> Profile
             </a>
 
-            
+            <a href="{{ route('stakeholder.proposals.index') }}" 
+                class="list-group-item list-group-item-action {{ request()->is('stakeholder/proposals*') ? 'active' : '' }}">
+                <i class="fas fa-book me-2"></i> Semua Proposal
+            </a>
+
+            <a href="{{ route('stakeholder.status-pengajuan') }}" 
+                class="list-group-item list-group-item-action {{ request()->is('stakeholder/status-pengajuan') ? 'active' : '' }}">
+                <i class="fas fa-check-circle me-2"></i> Status Pengajuan
+            </a>
+
 
             {{-- <a href="{{ route('stakeholder.evaluate') }}" 
                class="list-group-item list-group-item-action {{ request()->is('stakeholder/evaluate*') ? 'active' : '' }}">

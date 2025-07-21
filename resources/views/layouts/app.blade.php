@@ -52,11 +52,14 @@
             <!-- Main Content -->
             <div class="container-fluid p-4" style="flex-grow: 1;">
                 @yield('content')
+
+   
             </div>
         </div>
     </div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                    @yield('scripts')
 </body>
 </html>

@@ -1,44 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Data Proposal</title>
+    <meta charset="UTF-8">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-
-        h3, p {
-            text-align: center;
-        }
-
         table {
-            width: 100%;
             border-collapse: collapse;
+            width: 100%;
             font-size: 12px;
-            margin-top: 20px;
         }
 
-        thead th, tbody td {
+        th, td {
             border: 1px solid #000;
             padding: 6px;
-            text-align: center;
+            text-align: left;
         }
 
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        @media print {
-            @page {
-                size: landscape;
-            }
+        th {
+            background-color: #f0f0f0;
         }
     </style>
 </head>
 <body>
-    <h3>Data Pengajuan Proposal Donasi</h3>
-    <p>STAKEHOLDER PT RIAU ANDALAN PULP AND PAPER (RAPP)</p>
+    <h3 style="text-align: center;">Data Pengajuan Proposal Donasi</h3>
+    <h5 style="text-align: center;">STAKEHOLDER PT RIAU ANDALAN PULP AND PAPER (RAPP)</h5>
 
     <table>
         <thead>
@@ -49,7 +33,10 @@
                 <th>Email</th>
                 <th>No HP</th>
                 <th>No Rekening</th>
-                <th>Kabupaten</th>
+                <th>Alamat</th>
+                <th>Asal (Kab/Kec/Desa)</th>
+                <th>Tujuan Kabupaten</th>
+                <th>Jenis Proposal</th>
                 <th>Status</th>
                 <th>Tanggal</th>
             </tr>
@@ -61,9 +48,16 @@
                     <td>{{ $proposal->nama }}</td>
                     <td>{{ $proposal->title }}</td>
                     <td>{{ $proposal->email }}</td>
-                    <td>{{ $proposal->no_hp ?? '-' }}</td>
-                    <td>{{ $proposal->no_rekening ?? '-' }}</td>
-                    <td>{{ optional($proposal->kabupaten)->nama ?? '-' }}</td>
+                    <td>{{ $proposal->no_hp }}</td>
+                    <td>{{ $proposal->no_rekening }}</td>
+                    <td>{{ $proposal->alamat }}</td>
+                    <td>
+                        {{ $proposal->kabupaten->nama ?? '-' }} /
+                        {{ $proposal->kecamatan->nama ?? '-' }} /
+                        {{ $proposal->desa->nama ?? '-' }}
+                    </td>
+                    <td>{{ $proposal->kabupatenTujuan->nama ?? '-' }}</td>
+                    <td>{{ $proposal->jenisProposal->nama ?? '-' }}</td>
                     <td>{{ ucfirst($proposal->status) }}</td>
                     <td>{{ $proposal->created_at->format('d-m-Y') }}</td>
                 </tr>

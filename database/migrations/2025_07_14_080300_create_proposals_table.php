@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('title'); 
             $table->text('description'); 
             $table->string('email'); 
-            $table->string('no_hp');
-            $table->string('no_rekening'); 
+            $table->string('no_hp')->nullable();
+            $table->string('no_rekening')->nullable(); 
             $table->text('alamat'); 
 
             // Lokasi asal

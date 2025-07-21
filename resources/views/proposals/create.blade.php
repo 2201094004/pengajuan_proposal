@@ -89,10 +89,12 @@
                 {{-- Kabupaten Tujuan --}}
                 <div class="mb-3">
                     <label for="kabupaten_tujuan" class="form-label">Kabupaten Tujuan</label>
-                    <select class="form-select" id="kabupaten_tujuan" name="kabupaten_tujuan" required>
+                    <select name="kabupaten_tujuan_id" class="form-control">
                         <option value="">-- Pilih Kabupaten Tujuan --</option>
                         @foreach($kabupatens as $kabupaten)
-                            <option value="{{ $kabupaten->nama }}">{{ $kabupaten->nama }}</option>
+                            <option value="{{ $kabupaten->id }}">
+                                {{ $kabupaten->nama }}
+                            </option>
                         @endforeach
                     </select>
                 </div>

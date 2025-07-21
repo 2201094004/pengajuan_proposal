@@ -59,7 +59,7 @@
                                 @endif
                             </td>
                             <td>
-                                <a href="{{ route('proposals.show', $proposal->id) }}" class="btn btn-info btn-sm">Lihat</a>
+                                {{-- <a href="{{ route('proposals.show', $proposal->id) }}" class="btn btn-info btn-sm">Lihat</a> --}}
                                 
                                 @if($proposal->status == 'draft')
                                     <form action="{{ route('proposals.submit', $proposal->id) }}" method="POST" class="d-inline">@csrf
