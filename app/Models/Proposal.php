@@ -54,10 +54,10 @@ class Proposal extends Model
         return $this->belongsTo(Kabupaten::class, 'kabupaten_tujuan_id');
     }
 
-    public function evaluations()
-    {
-        return $this->hasMany(ProposalEvaluation::class);
-    }
+    // public function evaluations()
+    // {
+    //     return $this->hasMany(ProposalEvaluation::class);
+    // }
 
     public function jenisProposal()
     {

@@ -33,8 +33,8 @@
                 <i class="fas fa-user me-2"></i> Profile
             </a>
 
-            <a href="{{ route('jenis-proposals.index') }}" 
-                class="list-group-item list-group-item-action {{ request()->is('jenis-proposals*') ? 'active' : '' }}">
+            <a href="{{ route('admin.jenis-proposals.index') }}" 
+                class="list-group-item list-group-item-action {{ request()->is('admin/jenis-proposals*') ? 'active' : '' }}">
                 <i class="fas fa-folder me-2"></i> Jenis Proposal
             </a>
 
@@ -63,18 +63,18 @@
                 <i class="fas fa-envelope me-2"></i> Pesan Masuk
             </a>
 
-            <a href="{{ route('kabupatens.index') }}" 
-               class="list-group-item list-group-item-action {{ request()->is('kabupatens*') ? 'active' : '' }}">
+            <a href="{{ route('admin.kabupatens.index') }}" 
+                class="list-group-item list-group-item-action {{ request()->is('admin/kabupatens*') ? 'active' : '' }}">
                 <i class="fas fa-map-marker-alt me-2"></i> Kabupaten
             </a>
 
-            <a href="{{ route('kecamatans.index') }}" 
-               class="list-group-item list-group-item-action {{ request()->is('kecamatans*') ? 'active' : '' }}">
+            <a href="{{ route('admin.kecamatans.index') }}" 
+                class="list-group-item list-group-item-action {{ request()->is('admin/kecamatans*') ? 'active' : '' }}">
                 <i class="fas fa-map me-2"></i> Kecamatan
             </a>
 
-            <a href="{{ route('desas.index') }}" 
-               class="list-group-item list-group-item-action {{ request()->is('desas*') ? 'active' : '' }}">
+            <a href="{{ route('admin.desas.index') }}" 
+                class="list-group-item list-group-item-action {{ request()->is('admin/desas*') ? 'active' : '' }}">
                 <i class="fas fa-map-pin me-2"></i> Desa
             </a>
 

@@ -44,8 +44,8 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-   public function proposalevaluations()
-    {
-        return $this->hasMany(ProposalEvaluation::class);
-    }
+//    public function proposalevaluations()
+//     {
+//         return $this->hasMany(ProposalEvaluation::class);
+//     }
 }

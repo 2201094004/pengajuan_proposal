@@ -5,7 +5,7 @@
     <div class="card shadow-sm" data-aos="fade-up">
         <div class="card-header bg-white d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Data Kabupaten</h5>
-            <a href="{{ route('kabupatens.create') }}" class="btn btn-sm btn-primary">+ Tambah Kabupaten</a>
+            <a href="{{ route('admin.kabupatens.create') }}" class="btn btn-sm btn-primary">+ Tambah Kabupaten</a>
         </div>
 
         <div class="card-body table-responsive">
@@ -23,8 +23,8 @@
                             <td class="text-center">{{ $loop->iteration }}</td>
                             <td>{{ $kabupaten->nama }}</td>
                             <td class="text-center">
-                                <a href="{{ route('kabupatens.edit', $kabupaten->id) }}" class="btn btn-sm btn-warning">Edit</a>
-                                <form action="{{ route('kabupatens.destroy', $kabupaten->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus kabupaten ini?');">
+                                <a href="{{ route('admin.kabupatens.edit', $kabupaten->id) }}" class="btn btn-sm btn-warning">Edit</a>
+                                <form action="{{ route('admin.kabupatens.destroy', $kabupaten->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus kabupaten ini?');">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger">Hapus</button>

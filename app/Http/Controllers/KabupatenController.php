@@ -35,7 +35,7 @@ class KabupatenController extends Controller
 
         Kabupaten::create($request->only('nama'));
 
-        return redirect()->route('kabupatens.index')
+        return redirect()->route('admin.kabupatens.index')
                          ->with('success', 'Kabupaten berhasil ditambahkan');
     }
 
@@ -58,7 +58,7 @@ class KabupatenController extends Controller
 
         $kabupaten->update($request->only('nama'));
 
-        return redirect()->route('kabupatens.index')
+        return redirect()->route('admin.kabupatens.index')
                          ->with('success', 'Kabupaten berhasil diperbarui');
     }
 
@@ -69,7 +69,7 @@ class KabupatenController extends Controller
     {
         $kabupaten->delete();
 
-        return redirect()->route('kabupatens.index')
+        return redirect()->route('admin.kabupatens.index')
                          ->with('success', 'Kabupaten berhasil dihapus');
     }
 }

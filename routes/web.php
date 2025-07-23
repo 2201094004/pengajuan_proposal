@@ -19,32 +19,32 @@ use App\Http\Controllers\JenisProposalController;
 
 /*
 |--------------------------------------------------------------------------
-| HALAMAN UMUM
+| HALAMAN UMUM (Landing Page & Kontak)
 |--------------------------------------------------------------------------
 */
-
 Route::get('/', fn() => view('welcome'));
 Route::get('/landing', fn() => view('welcome'));
+
+// FORM KONTAK (Publik)
+Route::post('/contacts', [ContactController::class, 'store'])->name('contacts.store');
 
 /*
 |--------------------------------------------------------------------------
 | LOGIN & REGISTER
 |--------------------------------------------------------------------------
 */
-
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
 
-Auth::routes(); // Termasuk logout, lupa password, dll
+Auth::routes(); // Termasuk logout, reset password, dll
 
 /*
 |--------------------------------------------------------------------------
-| HALAMAN SETELAH LOGIN
+| HOME
 |--------------------------------------------------------------------------
 */
-
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 /*
@@ -63,45 +63,46 @@ Route::middleware(['auth'])->group(function () {
 | ADMIN
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
-    // Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-    Route::get('/', [DashboardController::class, 'admin'])->name('admin.dashboard');
-    
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    // Dashboard
+    Route::get('/', [DashboardController::class, 'admin'])->name('dashboard');
 
     // Status Pengajuan Proposal
-    Route::get('/status-pengajuan', [AdminController::class, 'statusPengajuan'])->name('admin.status-pengajuan');
+    Route::get('/status-pengajuan', [AdminController::class, 'statusPengajuan'])->name('status-pengajuan');
 
-    // Aksi Proposal (terima/tolak/revisi)
-    Route::post('/proposals/{id}/accept', [AdminController::class, 'acceptProposal'])->name('admin.proposal.accept');
-    Route::post('/proposals/{id}/reject', [AdminController::class, 'rejectProposal'])->name('admin.proposal.reject');
-    Route::post('/proposals/{id}/revision', [AdminController::class, 'revisionProposal'])->name('admin.proposal.revision');
+    // Aksi Proposal (terima, tolak, revisi)
+    Route::post('/proposals/{id}/accept', [AdminController::class, 'acceptProposal'])->name('proposal.accept');
+    Route::post('/proposals/{id}/reject', [AdminController::class, 'rejectProposal'])->name('proposal.reject');
+    Route::post('/proposals/{id}/revision', [AdminController::class, 'revisionProposal'])->name('proposal.revision');
 
-    // Lembar Penilaian
-    Route::get('/proposals/{id}/penilaian', [ProposalController::class, 'penilaian'])->name('admin.proposals.penilaian');
+    // Penilaian Proposal
+    Route::get('/proposals/{id}/penilaian', [ProposalController::class, 'penilaian'])->name('proposals.penilaian');
 
     // Manajemen Pengguna
-    Route::get('/users', [AdminController::class, 'manageUsers'])->name('admin.manage-users');
-    Route::get('/users/create', [AdminController::class, 'createUser'])->name('admin.create-user');
-    Route::post('/users', [AdminController::class, 'storeUser'])->name('admin.store-user');
-    Route::get('/users/{id}/edit', [AdminController::class, 'editUser'])->name('admin.edit-user');
-    Route::put('/users/{id}', [AdminController::class, 'updateUser'])->name('admin.update-user');
-    Route::delete('/users/{id}', [AdminController::class, 'deleteUser'])->name('admin.delete-user');
+    Route::get('/users', [AdminController::class, 'manageUsers'])->name('manage-users');
+    Route::get('/users/create', [AdminController::class, 'createUser'])->name('create-user');
+    Route::post('/users', [AdminController::class, 'storeUser'])->name('store-user');
+    Route::get('/users/{id}/edit', [AdminController::class, 'editUser'])->name('edit-user');
+    Route::put('/users/{id}', [AdminController::class, 'updateUser'])->name('update-user');
+    Route::delete('/users/{id}', [AdminController::class, 'deleteUser'])->name('delete-user');
 
     // Jenis Proposal
-    Route::resource('jenis-proposals', JenisProposalController::class);
+    Route::resource('jenis-proposals', JenisProposalController::class); // admin.jenis-proposals.*
 
-    // Ekspor
-    Route::get('/export/proposals', [ProposalController::class, 'exportFiltered'])->name('admin.proposals.export');
-    Route::get('/export/proposals/excel', [ProposalController::class, 'exportFilteredExcel'])->name('admin.proposals.export.excel');
-    Route::get('/export/proposals/pdf', [ProposalController::class, 'exportPdf'])->name('admin.proposals.export.pdf');
+    // Ekspor Proposal
+    Route::get('/export/proposals', [ProposalController::class, 'exportFiltered'])->name('proposals.export');
+    Route::get('/export/proposals/excel', [ProposalController::class, 'exportFilteredExcel'])->name('proposals.export.excel');
+    Route::get('/export/proposals/pdf', [ProposalController::class, 'exportPdf'])->name('proposals.export.pdf');
 
     // Master Data
+    // Route::resource('kabupatens', KabupatenController::class);     // admin.kabupatens.*
     Route::resource('kabupatens', KabupatenController::class);
-    Route::resource('kecamatans', KecamatanController::class);
-    Route::resource('desas', DesaController::class);
+    Route::resource('kecamatans', KecamatanController::class);     // admin.kecamatans.*
+    Route::resource('desas', DesaController::class);               // admin.desas.*
 
-    // Lihat pesan
-    Route::get('/contacts', [ContactController::class, 'index'])->name('admin.contacts.index');
+    // Pesan Masuk (Kontak)
+    Route::get('/contacts', [ContactController::class, 'index'])->name('contacts.index');
+    Route::delete('/contacts/{id}', [ContactController::class, 'destroy'])->name('contacts.destroy');
 });
 
 /*
@@ -109,33 +110,32 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
 | MASYARAKAT
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'role:masyarakat'])->prefix('masyarakat')->group(function () {
-    Route::get('/', [DashboardController::class, 'masyarakat'])->name('masyarakat.dashboard');
+Route::middleware(['auth', 'role:masyarakat'])->prefix('masyarakat')->name('masyarakat.')->group(function () {
+    Route::get('/', [DashboardController::class, 'masyarakat'])->name('dashboard');
 });
 
 /*
 |--------------------------------------------------------------------------
-| STAKEHOLDER & ADMIN (Evaluasi Proposal)
+| STAKEHOLDER & ADMIN
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'role:stakeholder,admin'])->prefix('stakeholder')->group(function () {
-    Route::get('/', [StakeholderController::class, 'dashboard'])->name('stakeholder.dashboard');
+Route::middleware(['auth', 'role:stakeholder,admin'])->prefix('stakeholder')->name('stakeholder.')->group(function () {
+    Route::get('/', [StakeholderController::class, 'dashboard'])->name('dashboard');
 
-    // Form Penilaian
-    Route::get('/evaluate/{id}', [StakeholderController::class, 'evaluateForm'])->name('stakeholder.evaluate.form');
-    Route::post('/evaluate/{id}', [StakeholderController::class, 'evaluateStore'])->name('stakeholder.evaluate.store');
+    // Penilaian Proposal
+    Route::get('/evaluate/{id}', [StakeholderController::class, 'evaluateForm'])->name('evaluate.form');
+    Route::post('/evaluate/{id}', [StakeholderController::class, 'evaluateStore'])->name('evaluate.store');
 
-    // List Evaluasi & History
-    Route::get('/evaluate', [StakeholderController::class, 'evaluateList'])->name('stakeholder.evaluate');
-    Route::get('/history', [StakeholderController::class, 'history'])->name('stakeholder.history');
+    Route::get('/evaluate', [StakeholderController::class, 'evaluateList'])->name('evaluate');
+    Route::get('/history', [StakeholderController::class, 'history'])->name('history');
 
-    // Melihat status pengajuan
-    Route::get('/status-pengajuan', [AdminController::class, 'statusPengajuan'])->name('stakeholder.status-pengajuan');
-    Route::get('/proposals', [AdminController::class, 'statusPengajuan'])->name('stakeholder.proposals');
+    // Melihat pengajuan
+    Route::get('/status-pengajuan', [AdminController::class, 'statusPengajuan'])->name('status-pengajuan');
+    Route::get('/proposals', [AdminController::class, 'statusPengajuan'])->name('proposals');
 
-    // Export oleh stakeholder
-    Route::get('/export/proposals/excel', [ProposalController::class, 'exportFilteredExcel'])->name('stakeholder.proposals.export.excel');
-    Route::get('/export/proposals/pdf', [ProposalController::class, 'exportPdf'])->name('stakeholder.proposals.export.pdf');
+    // Ekspor Proposal
+    Route::get('/export/proposals/excel', [ProposalController::class, 'exportFilteredExcel'])->name('proposals.export.excel');
+    Route::get('/export/proposals/pdf', [ProposalController::class, 'exportPdf'])->name('proposals.export.pdf');
 });
 
 /*
@@ -156,10 +156,3 @@ Route::middleware(['auth'])->group(function () {
     // Ekspor umum
     Route::get('/proposals/export/filtered', [ProposalExportController::class, 'exportFiltered'])->name('proposals.export.filtered');
 });
-
-/*
-|--------------------------------------------------------------------------
-| FORM KONTAK (Publik)
-|--------------------------------------------------------------------------
-*/
-Route::post('/contact', [ContactController::class, 'store'])->name('contacts.store');

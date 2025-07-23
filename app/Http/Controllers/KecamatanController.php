@@ -39,7 +39,7 @@ class KecamatanController extends Controller
 
         Kecamatan::create($request->only('nama', 'kabupaten_id'));
 
-        return redirect()->route('kecamatans.index')
+        return redirect()->route('admin.kecamatans.index')
                          ->with('success', 'Kecamatan berhasil ditambahkan');
     }
 
@@ -64,7 +64,7 @@ class KecamatanController extends Controller
 
         $kecamatan->update($request->only('nama', 'kabupaten_id'));
 
-        return redirect()->route('kecamatans.index')
+        return redirect()->route('admin.kecamatans.index')
                          ->with('success', 'Kecamatan berhasil diperbarui');
     }
 
@@ -75,7 +75,7 @@ class KecamatanController extends Controller
     {
         $kecamatan->delete();
 
-        return redirect()->route('kecamatans.index')
+        return redirect()->route('admin.kecamatans.index')
                          ->with('success', 'Kecamatan berhasil dihapus');
     }
 }
