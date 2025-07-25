@@ -96,7 +96,7 @@
                 <i class="fas fa-user me-2"></i> Profile
             </a>
 
-            <a href="{{ route('stakeholder.proposals.index') }}" 
+            <a href="{{ route('stakeholder.proposals') }}" 
                 class="list-group-item list-group-item-action {{ request()->is('stakeholder/proposals*') ? 'active' : '' }}">
                 <i class="fas fa-book me-2"></i> Semua Proposal
             </a>

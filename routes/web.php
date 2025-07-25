@@ -156,3 +156,13 @@ Route::middleware(['auth'])->group(function () {
     // Ekspor umum
     Route::get('/proposals/export/filtered', [ProposalExportController::class, 'exportFiltered'])->name('proposals.export.filtered');
 });
+
+// Stakeholder routes
+Route::prefix('stakeholder')->name('stakeholder.')->middleware(['auth', 'role:stakeholder'])->group(function () {
+    Route::get('/dashboard', [StakeholderController::class, 'index'])->name('dashboard');
+
+    Route::get('/proposals', [StakeholderController::class, 'semuaProposal'])->name('proposals');
+    Route::get('/status-pengajuan', [StakeholderController::class, 'statusPengajuan'])->name('status-pengajuan');
+});
+
+Route::get('/stakeholder/dashboard', [StakeholderController::class, 'dashboard'])->name('stakeholders.dashboard');

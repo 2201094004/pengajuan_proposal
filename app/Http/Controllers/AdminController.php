@@ -15,65 +15,77 @@ class AdminController extends Controller
     // Dashboard Admin
     public function dashboard()
     {
-        // Hitung jumlah proposal berdasarkan status
+        // Status statistik
         $totalDiterima = Proposal::where('status', 'accepted')->count();
-        $totalDitolak = Proposal::where('status', 'rejected')->count();
-        $totalRevisi = Proposal::where('status', 'revised')->count();
+        $totalDitolak  = Proposal::where('status', 'rejected')->count();
+        $totalRevisi   = Proposal::where('status', 'revised')->count();
 
-        // Ambil jumlah proposal per kabupaten
+        // Per Kabupaten
         $dataPerKabupaten = Proposal::select('kabupaten_id', DB::raw('count(*) as total'))
             ->groupBy('kabupaten_id')
-            ->with('kabupaten')
+            ->with('kabupaten') // Pastikan relasi 'kabupaten' ada
             ->get();
 
         $labelsKabupaten = $dataPerKabupaten->pluck('kabupaten.nama')->toArray();
         $jumlahProposalPerKabupaten = $dataPerKabupaten->pluck('total')->toArray();
 
+        // Per Jenis Proposal
+        $labelsJenisProposal = Proposal::select('jenis_proposal')->distinct()->pluck('jenis_proposal')->toArray();
+
+        $jumlahPerJenisProposal = [];
+        foreach ($labelsJenisProposal as $jenis) {
+            $jumlahPerJenisProposal[] = Proposal::where('jenis_proposal', $jenis)->count();
+        }
+
+        // Kirim ke view
         return view('admin.dashboard', compact(
             'totalDiterima',
             'totalDitolak',
             'totalRevisi',
             'labelsKabupaten',
-            'jumlahProposalPerKabupaten'
+            'jumlahProposalPerKabupaten',
+            'labelsJenisProposal',
+            'jumlahPerJenisProposal'
         ));
     }
 
     // Menampilkan daftar proposal dengan pencarian
     public function statusPengajuan(Request $request)
-{
-    $query = Proposal::query()->with(['kabupaten', 'kecamatan', 'desa', 'kabupatenTujuan', 'jenisProposal']);
+    {
+        $query = Proposal::query()->with(['kabupaten', 'kecamatan', 'desa', 'kabupatenTujuan', 'jenisProposal']);
 
-    // Pencarian berdasarkan nama atau judul
-    if ($request->filled('search')) {
-        $search = $request->search;
-        $query->where(function ($q) use ($search) {
-            $q->where('nama', 'like', "%{$search}%")
-              ->orWhere('title', 'like', "%{$search}%");
-        });
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%")
+                ->orWhere('title', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('kabupaten_id')) {
+            $query->where('kabupaten_id', $request->kabupaten_id);
+        }
+
+        if ($request->filled('range')) {
+            match ($request->range) {
+                'daily' => $query->whereDate('created_at', today()),
+                'weekly' => $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]),
+                'monthly' => $query->whereMonth('created_at', now()->month),
+                'yearly' => $query->whereYear('created_at', now()->year),
+                default => null,
+            };
+        }
+
+        $proposals = $query->latest()->get();
+        $kabupatens = Kabupaten::orderBy('nama')->get();
+        // $kabupatens = Kabupaten::all();
+
+        // return view('admin.status-pengajuan', compact('proposals', 'kabupatens'));
+           return view('admin.status-pengajuan', [
+        'proposals' => $proposals,
+        'kabupatens' => $kabupatens,
+           ]);
     }
-
-    // Filter berdasarkan kabupaten
-    if ($request->filled('kabupaten_id')) {
-        $query->where('kabupaten_id', $request->kabupaten_id);
-    }
-
-    // Filter waktu
-    if ($request->filled('range')) {
-        match ($request->range) {
-            'daily'   => $query->whereDate('created_at', today()),
-            'weekly'  => $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]),
-            'monthly' => $query->whereMonth('created_at', now()->month),
-            'yearly'  => $query->whereYear('created_at', now()->year),
-            default   => null,
-        };
-    }
-
-    $proposals  = $query->latest()->get();
-    $kabupatens = Kabupaten::all(); // ⬅️ ini penting
-
-    return view('admin.status-pengajuan', compact('proposals', 'kabupatens'));
-}
-
 
     // Menerima proposal
     public function acceptProposal($id)

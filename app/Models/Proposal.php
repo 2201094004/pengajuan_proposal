@@ -20,6 +20,7 @@ class Proposal extends Model
         'no_hp',
         'no_rekening',
         'alamat',
+        'jenis_proposal',
         'kabupaten_id',
         'kecamatan_id',
         'desa_id',
@@ -54,14 +55,19 @@ class Proposal extends Model
         return $this->belongsTo(Kabupaten::class, 'kabupaten_tujuan_id');
     }
 
+    public function jenisProposal()
+    {
+        return $this->belongsTo(JenisProposal::class, 'jenis_proposal_id');
+    }
+
     // public function evaluations()
     // {
     //     return $this->hasMany(ProposalEvaluation::class);
     // }
 
-    public function jenisProposal()
-    {
-        return $this->belongsTo(JenisProposal::class);
-    }
+    // public function jenisProposal()
+    // {
+    //     return $this->belongsTo(JenisProposal::class);
+    // }
 
 }

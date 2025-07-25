@@ -2,127 +2,74 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Proposal;
-use App\Models\ProposalEvaluation;
-use App\Models\User;
-use App\Models\StatusHistory;
-use App\Models\LogActivity;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use App\Models\Proposal;
+use App\Models\Kabupaten;
+use App\Models\JenisProposal;
 
 class StakeholderController extends Controller
 {
     public function dashboard()
     {
-        $proposals = Proposal::where('status', 'submitted')->get();
-        return view('stakeholder.dashboard', compact('proposals'));
-    }
+        // Status statistik
+        $totalDiterima = Proposal::where('status', 'accepted')->count();
+        $totalDitolak  = Proposal::where('status', 'rejected')->count();
+        $totalRevisi   = Proposal::where('status', 'revised')->count();
 
-    public function evaluateForm($id)
-    {
-        $proposal = Proposal::findOrFail($id);
-        return view('stakeholder.evaluate', compact('proposal'));
-    }
-
-    public function evaluateList()
-    {
-        $proposals = Proposal::where('status', 'submitted')->get(); // Atau sesuaikan logika
-        return view('stakeholder.evaluate-list', compact('proposals'));
-    }
-
-    public function history()
-    {
-        $evaluations = auth()->user()
-            ->proposalevaluations()
-            ->with('proposal')
-            ->latest()
+        // Statistik per Kabupaten
+        $dataPerKabupaten = Proposal::select('kabupaten_id', DB::raw('count(*) as total'))
+            ->groupBy('kabupaten_id')
+            ->with('kabupaten') // relasi harus ada di model Proposal
             ->get();
 
-        return view('stakeholder.history', compact('evaluations'));
+        $labelsKabupaten = $dataPerKabupaten->pluck('kabupaten.nama')->toArray();
+        $jumlahProposalPerKabupaten = $dataPerKabupaten->pluck('total')->toArray();
+
+        // Statistik per Jenis Proposal
+        $dataPerJenisProposal = Proposal::select('jenis_proposal_id', DB::raw('count(*) as total'))
+            ->groupBy('jenis_proposal_id')
+            ->with('jenisProposal') // relasi harus ada di model Proposal
+            ->get();
+
+        $labelsJenisProposal = $dataPerJenisProposal->pluck('jenisProposal.nama')->toArray();
+        $jumlahPerJenisProposal = $dataPerJenisProposal->pluck('total')->toArray();
+
+        return view('stakeholder.dashboard', compact(
+            'totalDiterima',
+            'totalDitolak',
+            'totalRevisi',
+            'labelsKabupaten',
+            'jumlahProposalPerKabupaten',
+            'labelsJenisProposal',
+            'jumlahPerJenisProposal'
+        ));
     }
 
-    public function evaluateStore(Request $request, $id)
+    public function statusPengajuan(Request $request)
     {
-        $request->validate([
-            'nilai_status' => 'required|integer',
-            'nilai_pengaruh' => 'required|integer',
-            'nilai_popularitas' => 'required|integer',
-            'nilai_hubungan_perusahaan' => 'required|integer',
-            'nilai_pelaksana' => 'required|integer',
-            'nilai_tujuan' => 'required|integer',
-            'nilai_lokasi' => 'required|integer',
-            'nilai_waktu' => 'required|integer',
-            'nilai_estimasi_dana' => 'required|integer',
-            'nilai_dampak' => 'required|integer',
-            'nilai_partisipasi' => 'required|integer',
-            'nilai_pengaruh_perusahaan' => 'required|integer',
-            'nilai_pencitraan' => 'required|integer',
-            'nilai_referensi' => 'required|integer',
-            'pemberi_rekomendasi' => 'required|string|max:255',
-            'kesimpulan' => 'required|in:dibantu,tidak dibantu',
-            'catatan' => 'nullable|string',
-        ]);
+        $query = Proposal::query();
 
-        $totalScore = collect($request->only([
-            'nilai_status',
-            'nilai_pengaruh',
-            'nilai_popularitas',
-            'nilai_hubungan_perusahaan',
-            'nilai_pelaksana',
-            'nilai_tujuan',
-            'nilai_lokasi',
-            'nilai_waktu',
-            'nilai_estimasi_dana',
-            'nilai_dampak',
-            'nilai_partisipasi',
-            'nilai_pengaruh_perusahaan',
-            'nilai_pencitraan',
-            'nilai_referensi'
-        ]))->sum();
+        // Filter kabupaten
+        if ($request->filled('kabupaten_id')) {
+            $query->where('kabupaten_id', $request->kabupaten_id);
+        }
 
-        ProposalEvaluation::create([
-            'proposal_id' => $id,
-            'user_id' => Auth::id(),
-            'nilai_status' => $request->nilai_status,
-            'nilai_pengaruh' => $request->nilai_pengaruh,
-            'nilai_popularitas' => $request->nilai_popularitas,
-            'nilai_hubungan_perusahaan' => $request->nilai_hubungan_perusahaan,
-            'nilai_pelaksana' => $request->nilai_pelaksana,
-            'nilai_tujuan' => $request->nilai_tujuan,
-            'nilai_lokasi' => $request->nilai_lokasi,
-            'nilai_waktu' => $request->nilai_waktu,
-            'nilai_estimasi_dana' => $request->nilai_estimasi_dana,
-            'nilai_dampak' => $request->nilai_dampak,
-            'nilai_partisipasi' => $request->nilai_partisipasi,
-            'nilai_pengaruh_perusahaan' => $request->nilai_pengaruh_perusahaan,
-            'nilai_pencitraan' => $request->nilai_pencitraan,
-            'nilai_referensi' => $request->nilai_referensi,
-            'pemberi_rekomendasi' => $request->pemberi_rekomendasi,
-            'total_score' => $totalScore,
-            'kesimpulan' => $request->kesimpulan,
-            'catatan' => $request->catatan,
-        ]);
+        // Filter rentang waktu
+        if ($request->filled(['start_date', 'end_date'])) {
+            $query->whereBetween('created_at', [$request->start_date, $request->end_date]);
+        }
 
-        // Update status proposal jadi accepted/rejected tergantung kesimpulan
-        $proposal = Proposal::findOrFail($id);
-        $proposal->status = $request->kesimpulan === 'dibantu' ? 'accepted' : 'rejected';
-        $proposal->save();
+        $proposals = $query->get();
+        $kabupatens = Kabupaten::all();
 
-        // Catat ke status history
-        StatusHistory::create([
-            'proposal_id' => $id,
-            'user_id' => Auth::id(),
-            'status' => $proposal->status,
-            'catatan' => $request->catatan,
-        ]);
-
-        // Catat ke log aktivitas
-        LogActivity::create([
-            'user_id' => Auth::id(),
-            'aktivitas' => 'Evaluasi Proposal',
-            'keterangan' => 'Melakukan evaluasi terhadap proposal #' . $proposal->id,
-        ]);
-
-        return redirect()->route('stakeholder.dashboard')->with('success', 'Evaluasi berhasil disimpan.');
+        return view('admin.status-pengajuan', compact('proposals', 'kabupatens'));
     }
+
+    public function semuaProposal()
+    {
+        $proposals = Proposal::with(['kabupaten', 'jenisProposal'])->latest()->get();
+        return view('proposals.index', compact('proposals'));
+    }
+
 }
