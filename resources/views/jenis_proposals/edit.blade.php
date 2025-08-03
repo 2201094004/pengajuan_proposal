@@ -8,7 +8,7 @@
         </div>
 
         <div class="card-body">
-            <form action="{{ route('admin.jenis-proposals.update', $jenisProposal->id) }}" method="POST">
+            <form action="{{ route('admin.jenis_proposals.update', $jenisProposal->id) }}" method="POST">
                 @csrf
                 @method('PUT')
 
@@ -20,7 +20,7 @@
 
                 {{-- Tombol --}}
                 <div class="d-flex justify-content-between">
-                    <a href="{{ route('admin.jenis-proposals.index') }}" class="btn btn-secondary">← Kembali</a>
+                    <a href="{{ route('admin.jenis_proposals.index') }}" class="btn btn-secondary">← Kembali</a>
                     <button type="submit" class="btn btn-success">Update Jenis Proposal</button>
                 </div>
             </form>

@@ -3,6 +3,7 @@
 @section('content')
 <div class="container">
     <div class="card shadow-sm mb-4" data-aos="fade-up">
+
         {{-- HEADER --}}
         <div class="card-header bg-white">
             <h5 class="mb-3">Status Pengajuan Proposal</h5>
@@ -21,14 +22,14 @@
                     </select>
                 </div>
 
-                {{-- Form Export --}}
+                {{-- Export & Range Filter --}}
                 <div class="col-md-8 d-flex align-items-end justify-content-md-end">
                     <form action="#" method="GET" class="d-flex align-items-center flex-wrap">
                         {{-- Rentang Waktu --}}
                         <select name="range" class="form-select form-select-sm me-2 mb-2" style="max-width: 180px;">
-                            <option value="daily"  {{ request('range') == 'daily'  ? 'selected' : '' }}>Harian</option>
-                            <option value="weekly" {{ request('range') == 'weekly' ? 'selected' : '' }}>Mingguan</option>
-                            <option value="monthly" {{ request('range') == 'monthly'? 'selected' : '' }}>Bulanan</option>
+                            <option value="daily"   {{ request('range') == 'daily' ? 'selected' : '' }}>Harian</option>
+                            <option value="weekly"  {{ request('range') == 'weekly' ? 'selected' : '' }}>Mingguan</option>
+                            <option value="monthly" {{ request('range') == 'monthly' ? 'selected' : '' }}>Bulanan</option>
                             <option value="yearly"  {{ request('range') == 'yearly' ? 'selected' : '' }}>Tahunan</option>
                         </select>
 
@@ -46,6 +47,7 @@
             </div>
         </div>
 
+        {{-- BODY --}}
         <div class="card-body">
             {{-- FORM PENCARIAN --}}
             <form method="GET" action="{{ route('admin.status-pengajuan') }}" class="mb-4">
@@ -101,28 +103,29 @@
                                 </td>
                                 <td>
                                     @if($proposal->proposal_file)
-                                        <a href="{{ asset('storage/documents/'.$proposal->proposal_file) }}"
-                                           target="_blank" class="btn btn-sm btn-outline-secondary">
-                                           Lihat
+                                        <a href="{{ asset('storage/documents/'.$proposal->proposal_file) }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                            Lihat
                                         </a>
                                     @else
                                         <span class="text-muted">-</span>
                                     @endif
                                 </td>
                                 <td>
-                                    <a href="{{ route('admin.proposals.penilaian', $proposal->id) }}"
-                                        class="btn btn-sm btn-info mb-1" target="_blank">
+                                    <a href="{{ route('admin.proposals.penilaian', $proposal->id) }}" class="btn btn-sm btn-info mb-1" target="_blank">
                                         <i class="fas fa-eye"></i>
                                     </a>
 
                                     @if($proposal->status === 'submitted')
-                                        <form action="{{ route('admin.proposal.accept', $proposal->id) }}" method="POST" class="d-inline">@csrf
+                                        <form action="{{ route('admin.proposal.accept', $proposal->id) }}" method="POST" class="d-inline">
+                                            @csrf
                                             <button class="btn btn-sm btn-success">✓ Terima</button>
                                         </form>
-                                        <form action="{{ route('admin.proposal.reject', $proposal->id) }}" method="POST" class="d-inline">@csrf
+                                        <form action="{{ route('admin.proposal.reject', $proposal->id) }}" method="POST" class="d-inline">
+                                            @csrf
                                             <button class="btn btn-sm btn-danger">× Tolak</button>
                                         </form>
-                                        <form action="{{ route('admin.proposal.revision', $proposal->id) }}" method="POST" class="d-inline">@csrf
+                                        <form action="{{ route('admin.proposal.revision', $proposal->id) }}" method="POST" class="d-inline">
+                                            @csrf
                                             <button class="btn btn-sm btn-warning">↺ Revisi</button>
                                         </form>
                                     @else
@@ -139,6 +142,7 @@
                 </table>
             </div>
         </div>
+
     </div>
 </div>
 @endsection

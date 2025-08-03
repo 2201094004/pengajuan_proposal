@@ -28,7 +28,7 @@ class JenisProposalController extends Controller
             'nama' => $request->nama,
         ]);
 
-        return redirect()->route('jenis_proposals.index')->with('success', 'Jenis Proposal berhasil ditambahkan');
+        return redirect()->route('admin.jenis_proposals.index')->with('success', 'Jenis Proposal berhasil ditambahkan');
     }
 
     public function edit(JenisProposal $jenisProposal)
@@ -46,13 +46,13 @@ class JenisProposalController extends Controller
             'nama' => $request->nama,
         ]);
 
-        return redirect()->route('jenis-proposals.index')->with('success', 'Jenis Proposal berhasil diperbarui');
+        return redirect()->route('admin.jenis_proposals.index')->with('success', 'Jenis Proposal berhasil diperbarui');
     }
 
     public function destroy(JenisProposal $jenisProposal)
     {
         $jenisProposal->delete();
 
-        return redirect()->route('jenis-proposals.index')->with('success', 'Jenis Proposal berhasil dihapus');
+        return redirect()->route('admin.jenis_proposals.index')->with('success', 'Jenis Proposal berhasil dihapus');
     }
 }

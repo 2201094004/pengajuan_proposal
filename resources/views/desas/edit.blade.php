@@ -8,7 +8,7 @@
         </div>
 
         <div class="card-body">
-            <form action="{{ route('desas.update', $desa->id) }}" method="POST">
+            <form action="{{ route('admin.desas.update', $desa->id) }}" method="POST">
                 @csrf
                 @method('PUT')
 
@@ -32,7 +32,7 @@
 
                 {{-- Tombol --}}
                 <div class="d-flex justify-content-between">
-                    <a href="{{ route('desas.index') }}" class="btn btn-secondary">← Kembali</a>
+                    <a href="{{ route('admin.desas.index') }}" class="btn btn-secondary">← Kembali</a>
                     <button type="submit" class="btn btn-success">Update Desa</button>
                 </div>
             </form>

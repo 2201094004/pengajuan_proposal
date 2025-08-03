@@ -33,7 +33,7 @@
                 <i class="fas fa-user me-2"></i> Profile
             </a>
 
-            <a href="{{ route('admin.jenis-proposals.index') }}" 
+            <a href="{{ route('admin.jenis_proposals.index') }}" 
                 class="list-group-item list-group-item-action {{ request()->is('admin/jenis-proposals*') ? 'active' : '' }}">
                 <i class="fas fa-folder me-2"></i> Jenis Proposal
             </a>

@@ -5,7 +5,7 @@
     <div class="card shadow-sm" data-aos="fade-up">
         <div class="card-header bg-white d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Data Jenis Proposal</h5>
-            <a href="{{ route('admin.jenis-proposals.create') }}" class="btn btn-sm btn-primary">+ Tambah Jenis</a>
+            <a href="{{ route('admin.jenis_proposals.create') }}" class="btn btn-sm btn-primary">+ Tambah Jenis</a>
         </div>
 
         <div class="card-body table-responsive">
@@ -23,8 +23,8 @@
                             <td class="text-center">{{ $loop->iteration }}</td>
                             <td>{{ $jenis->nama }}</td>
                             <td class="text-center">
-                                <a href="{{ route('admin.jenis-proposals.edit', $jenis->id) }}" class="btn btn-sm btn-warning">Edit</a>
-                                <form action="{{ route('admin.jenis-proposals.destroy', $jenis->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus jenis proposal ini?');">
+                                <a href="{{ route('admin.jenis_proposals.edit', $jenis->id) }}" class="btn btn-sm btn-warning">Edit</a>
+                                <form action="{{ route('admin.jenis_proposals.destroy', $jenis->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus jenis proposal ini?');">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger">Hapus</button>

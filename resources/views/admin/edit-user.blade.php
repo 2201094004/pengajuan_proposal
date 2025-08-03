@@ -43,7 +43,7 @@
 
                 {{-- Tombol --}}
                 <div class="d-flex justify-content-between">
-                    <a href="{{ route('admin.list-user') }}" class="btn btn-secondary">← Kembali</a>
+                    <a href="{{ route('admin.manage-users') }}" class="btn btn-secondary">← Kembali</a>
                     <button type="submit" class="btn btn-success">Update Pengguna</button>
                 </div>
             </form>

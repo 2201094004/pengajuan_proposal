@@ -8,7 +8,7 @@
         </div>
 
         <div class="card-body">
-            <form action="{{ route('admin.jenis-proposals.store') }}" method="POST">
+            <form action="{{ route('admin.jenis_proposals.store') }}" method="POST">
                 @csrf
 
                 {{-- Nama Jenis Proposal --}}
@@ -19,7 +19,7 @@
 
                 {{-- Tombol --}}
                 <div class="d-flex justify-content-between">
-                    <a href="{{ route('admin.jenis-proposals.index') }}" class="btn btn-secondary">← Kembali</a>
+                    <a href="{{ route('admin.jenis_proposals.index') }}" class="btn btn-secondary">← Kembali</a>
                     <button type="submit" class="btn btn-primary">Simpan Jenis Proposal</button>
                 </div>
             </form>

@@ -1,13 +1,16 @@
+<!-- Tambahkan SweetAlert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <style>
     .navbar-large {
-        padding: 1.5rem 1rem; /* Mengatur padding lebih besar */
-        font-size: 1.25rem; /* Memperbesar ukuran font */
+        padding: 1.5rem 1rem;
+        font-size: 1.25rem;
     }
     .navbar-large .navbar-brand {
-        font-size: 1.5rem; /* Memperbesar teks "Dashboard" */
+        font-size: 1.5rem;
     }
     .navbar-large img {
-        width: 50px; /* Memperbesar ukuran logo */
+        width: 50px;
         height: 50px;
     }
 </style>
@@ -22,12 +25,43 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                    <form id="logoutForm" action="{{ route('logout') }}" method="POST" class="d-inline">
                         @csrf
-                        <button type="submit" class="btn btn-danger btn-sm">Logout</button>
+                        <button type="button" class="btn btn-danger btn-sm" id="logoutBtn">Logout</button>
                     </form>
                 </li>
             </ul>
         </div>
     </div>
 </nav>
+
+<!-- SweetAlert untuk konfirmasi logout -->
+<script>
+    document.getElementById('logoutBtn').addEventListener('click', function(e) {
+        Swal.fire({
+            title: 'Apakah Anda yakin ingin keluar?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, Logout',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('logoutForm').submit();
+            }
+        });
+    });
+</script>
+
+<!-- SweetAlert untuk notifikasi sukses -->
+@if(session('success'))
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: '{{ session('success') }}',
+            showConfirmButton: false,
+            timer: 2000
+        });
+    </script>
+@endif

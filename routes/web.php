@@ -19,37 +19,29 @@ use App\Http\Controllers\JenisProposalController;
 
 /*
 |--------------------------------------------------------------------------
-| HALAMAN UMUM (Landing Page & Kontak)
+| PUBLIC (Landing & Kontak)
 |--------------------------------------------------------------------------
 */
-Route::get('/', fn() => view('welcome'));
-Route::get('/landing', fn() => view('welcome'));
-
-// FORM KONTAK (Publik)
+Route::view('/', 'welcome');
+Route::view('/landing', 'welcome');
 Route::post('/contacts', [ContactController::class, 'store'])->name('contacts.store');
 
 /*
 |--------------------------------------------------------------------------
-| LOGIN & REGISTER
+| AUTHENTICATION (Login & Register)
 |--------------------------------------------------------------------------
 */
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
+Auth::routes(); // include logout, reset, etc.
 
-Auth::routes(); // Termasuk logout, reset password, dll
-
-/*
-|--------------------------------------------------------------------------
-| HOME
-|--------------------------------------------------------------------------
-*/
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 /*
 |--------------------------------------------------------------------------
-| PROFIL (Semua Role)
+| PROFILE (Semua Role)
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth'])->group(function () {
@@ -64,30 +56,27 @@ Route::middleware(['auth'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    // Dashboard
     Route::get('/', [DashboardController::class, 'admin'])->name('dashboard');
 
-    // Status Pengajuan Proposal
+    // Proposal
     Route::get('/status-pengajuan', [AdminController::class, 'statusPengajuan'])->name('status-pengajuan');
-
-    // Aksi Proposal (terima, tolak, revisi)
     Route::post('/proposals/{id}/accept', [AdminController::class, 'acceptProposal'])->name('proposal.accept');
     Route::post('/proposals/{id}/reject', [AdminController::class, 'rejectProposal'])->name('proposal.reject');
     Route::post('/proposals/{id}/revision', [AdminController::class, 'revisionProposal'])->name('proposal.revision');
-
-    // Penilaian Proposal
     Route::get('/proposals/{id}/penilaian', [ProposalController::class, 'penilaian'])->name('proposals.penilaian');
 
-    // Manajemen Pengguna
+    // User Management
+    Route::resource('users', AdminController::class)->only([]); // Optional, already defined below
     Route::get('/users', [AdminController::class, 'manageUsers'])->name('manage-users');
     Route::get('/users/create', [AdminController::class, 'createUser'])->name('create-user');
     Route::post('/users', [AdminController::class, 'storeUser'])->name('store-user');
     Route::get('/users/{id}/edit', [AdminController::class, 'editUser'])->name('edit-user');
     Route::put('/users/{id}', [AdminController::class, 'updateUser'])->name('update-user');
     Route::delete('/users/{id}', [AdminController::class, 'deleteUser'])->name('delete-user');
+    Route::get('/admin/list-user', [AdminController::class, 'index'])->name('admin.list-user');
 
     // Jenis Proposal
-    Route::resource('jenis-proposals', JenisProposalController::class); // admin.jenis-proposals.*
+    Route::resource('jenis_proposals', JenisProposalController::class); // admin.jenis_proposals.*
 
     // Ekspor Proposal
     Route::get('/export/proposals', [ProposalController::class, 'exportFiltered'])->name('proposals.export');
@@ -95,12 +84,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/export/proposals/pdf', [ProposalController::class, 'exportPdf'])->name('proposals.export.pdf');
 
     // Master Data
-    // Route::resource('kabupatens', KabupatenController::class);     // admin.kabupatens.*
     Route::resource('kabupatens', KabupatenController::class);
-    Route::resource('kecamatans', KecamatanController::class);     // admin.kecamatans.*
-    Route::resource('desas', DesaController::class);               // admin.desas.*
+    Route::resource('kecamatans', KecamatanController::class);
+    Route::resource('desas', DesaController::class);
 
-    // Pesan Masuk (Kontak)
+    // Pesan Masuk
     Route::get('/contacts', [ContactController::class, 'index'])->name('contacts.index');
     Route::delete('/contacts/{id}', [ContactController::class, 'destroy'])->name('contacts.destroy');
 });
@@ -121,48 +109,34 @@ Route::middleware(['auth', 'role:masyarakat'])->prefix('masyarakat')->name('masy
 */
 Route::middleware(['auth', 'role:stakeholder,admin'])->prefix('stakeholder')->name('stakeholder.')->group(function () {
     Route::get('/', [StakeholderController::class, 'dashboard'])->name('dashboard');
-
-    // Penilaian Proposal
+    Route::get('/evaluate', [StakeholderController::class, 'evaluateList'])->name('evaluate');
     Route::get('/evaluate/{id}', [StakeholderController::class, 'evaluateForm'])->name('evaluate.form');
     Route::post('/evaluate/{id}', [StakeholderController::class, 'evaluateStore'])->name('evaluate.store');
-
-    Route::get('/evaluate', [StakeholderController::class, 'evaluateList'])->name('evaluate');
     Route::get('/history', [StakeholderController::class, 'history'])->name('history');
-
-    // Melihat pengajuan
     Route::get('/status-pengajuan', [AdminController::class, 'statusPengajuan'])->name('status-pengajuan');
     Route::get('/proposals', [AdminController::class, 'statusPengajuan'])->name('proposals');
-
-    // Ekspor Proposal
     Route::get('/export/proposals/excel', [ProposalController::class, 'exportFilteredExcel'])->name('proposals.export.excel');
     Route::get('/export/proposals/pdf', [ProposalController::class, 'exportPdf'])->name('proposals.export.pdf');
 });
 
 /*
 |--------------------------------------------------------------------------
-| PROPOSAL (Untuk Semua Role Login)
+| PROPOSAL (Semua yang Login)
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth'])->group(function () {
-    Route::get('proposals', [ProposalController::class, 'index'])->name('proposals.index');
-    Route::get('proposals/create', [ProposalController::class, 'create'])->name('proposals.create');
-    Route::post('proposals', [ProposalController::class, 'store'])->name('proposals.store');
-    Route::get('proposals/{id}', [ProposalController::class, 'show'])->name('proposals.show');
-    Route::get('proposals/{id}/edit', [ProposalController::class, 'edit'])->name('proposals.edit');
-    Route::put('proposals/{id}', [ProposalController::class, 'update'])->name('proposals.update');
-    Route::delete('proposals/{id}', [ProposalController::class, 'destroy'])->name('proposals.destroy');
+    Route::resource('proposals', ProposalController::class)->except(['penilaian']);
     Route::post('proposals/{id}/submit', [ProposalController::class, 'submit'])->name('proposals.submit');
-
-    // Ekspor umum
     Route::get('/proposals/export/filtered', [ProposalExportController::class, 'exportFiltered'])->name('proposals.export.filtered');
 });
 
-// Stakeholder routes
-Route::prefix('stakeholder')->name('stakeholder.')->middleware(['auth', 'role:stakeholder'])->group(function () {
-    Route::get('/dashboard', [StakeholderController::class, 'index'])->name('dashboard');
-
-    Route::get('/proposals', [StakeholderController::class, 'semuaProposal'])->name('proposals');
-    Route::get('/status-pengajuan', [StakeholderController::class, 'statusPengajuan'])->name('status-pengajuan');
+/*
+|--------------------------------------------------------------------------
+| STAKEHOLDER (Dobel Cek)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:stakeholder'])->prefix('stakeholder')->group(function () {
+    Route::get('/dashboard', [StakeholderController::class, 'index'])->name('stakeholders.dashboard');
+    Route::get('/proposals', [StakeholderController::class, 'semuaProposal'])->name('stakeholder.proposals');
+    Route::get('/status-pengajuan', [StakeholderController::class, 'statusPengajuan'])->name('stakeholder.status-pengajuan');
 });
-
-Route::get('/stakeholder/dashboard', [StakeholderController::class, 'dashboard'])->name('stakeholders.dashboard');
