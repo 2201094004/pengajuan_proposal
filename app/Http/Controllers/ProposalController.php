@@ -235,4 +235,20 @@ class ProposalController extends Controller
         $proposal = Proposal::findOrFail($id);
         return view('proposals.penilaian', compact('proposal'));
     }
+
+    public function updatePenilaian(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:accepted,rejected,revised',
+            'catatan' => 'nullable|string'
+        ]);
+
+        $proposal = Proposal::findOrFail($id);
+        $proposal->status = $request->status;
+        $proposal->catatan = $request->catatan;
+        $proposal->save();
+
+        return redirect()->route('admin.status-pengajuan')->with('success', 'Penilaian berhasil disimpan.');
+    }
+
 }

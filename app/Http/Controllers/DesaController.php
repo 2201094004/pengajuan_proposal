@@ -70,11 +70,24 @@ class DesaController extends Controller
     /**
      * Menghapus data desa
      */
+    // public function destroy(Desa $desa)
+    // {
+    //     $desa->delete();
+
+    //     return redirect()->route('admin.desas.index')
+    //                      ->with('success', 'Desa berhasil dihapus');
+    // }
     public function destroy(Desa $desa)
     {
+        if ($desa->proposals()->exists()) {
+            return redirect()->route('admin.desas.index')
+                            ->with('error', 'Tidak bisa menghapus desa karena masih ada proposal terkait.');
+        }
+
         $desa->delete();
 
         return redirect()->route('admin.desas.index')
-                         ->with('success', 'Desa berhasil dihapus');
+                        ->with('success', 'Desa berhasil dihapus');
     }
+
 }

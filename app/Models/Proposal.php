@@ -60,6 +60,11 @@ class Proposal extends Model
         return $this->belongsTo(JenisProposal::class, 'jenis_proposal_id');
     }
 
+    public function penilaian()
+    {
+        return $this->hasOne(Penilaian::class, 'proposal_id');
+    }
+
     // public function evaluations()
     // {
     //     return $this->hasMany(ProposalEvaluation::class);

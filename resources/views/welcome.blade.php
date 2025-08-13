@@ -90,12 +90,12 @@
   </section>
 
   <!-- About Us Section -->
-  <section id="about" class="bg-light py-5">
+  {{-- <section id="about" class="bg-light py-5">
     <div class="container">
       <h2 class="text-center mb-4">About Us</h2>
       <p class="text-center">Kami berkomitmen untuk menyediakan layanan pengembangan web terbaik bagi klien kami. Tim ahli kami bekerja tanpa lelah untuk mewujudkan ide-ide Anda.</p>
     </div>
-  </section>
+  </section> --}}
 
   <!-- Contact Section -->
   <section id="contact" class="py-5">
