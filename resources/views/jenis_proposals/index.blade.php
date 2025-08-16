@@ -12,7 +12,7 @@
             <table class="table table-hover table-bordered align-middle">
                 <thead class="table-light text-center">
                     <tr>
-                        <th>#</th>
+                        <th>No</th>
                         <th>Nama Jenis Proposal</th>
                         <th style="width: 150px;">Aksi</th>
                     </tr>
@@ -39,6 +39,39 @@
                 </tbody>
             </table>
         </div>
+         @if(method_exists($jenisProposals, 'hasPages') && $jenisProposals->hasPages())
+    <nav aria-label="Page navigation example" class="mt-3">
+        <ul class="pagination justify-content-center">
+            {{-- Tombol First --}}
+            <li class="page-item {{ $jenisProposals->onFirstPage() ? 'disabled' : '' }}">
+                <a class="page-link" href="{{ $jenisProposals->url(1) }}">First</a>
+            </li>
+
+            {{-- Tombol Prev --}}
+            <li class="page-item {{ $jenisProposals->onFirstPage() ? 'disabled' : '' }}">
+                <a class="page-link" href="{{ $jenisProposals->previousPageUrl() ?? '#' }}" aria-label="Previous">«</a>
+            </li>
+
+            {{-- Nomor Halaman --}}
+            @foreach ($jenisProposals->getUrlRange(1, $jenisProposals->lastPage()) as $page => $url)
+                <li class="page-item {{ $page == $jenisProposals->currentPage() ? 'active' : '' }}">
+                    <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                </li>
+            @endforeach
+
+            {{-- Tombol Next --}}
+            <li class="page-item {{ !$jenisProposals->hasMorePages() ? 'disabled' : '' }}">
+                <a class="page-link" href="{{ $jenisProposals->nextPageUrl() ?? '#' }}" aria-label="Next">»</a>
+            </li>
+
+            {{-- Tombol Last --}}
+            <li class="page-item {{ !$jenisProposals->hasMorePages() ? 'disabled' : '' }}">
+                <a class="page-link" href="{{ $jenisProposals->url($jenisProposals->lastPage()) }}">Last</a>
+            </li>
+        </ul>
+    </nav>
+@endif
+
     </div>
 </div>
 @endsection

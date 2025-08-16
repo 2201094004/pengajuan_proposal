@@ -12,7 +12,7 @@
             <table class="table table-hover table-bordered align-middle">
                 <thead class="table-light text-center">
                     <tr>
-                        <th>#</th>
+                        <th>No</th>
                         <th>Nama Desa</th>
                         <th>Kecamatan</th>
                         <th style="width: 150px;">Aksi</th>
@@ -41,6 +41,39 @@
                 </tbody>
             </table>
         </div>
+        @if(method_exists($desas, 'hasPages') && $desas->hasPages())
+    <nav aria-label="Page navigation example" class="mt-3">
+        <ul class="pagination justify-content-center">
+            {{-- Tombol First --}}
+            <li class="page-item {{ $desas->onFirstPage() ? 'disabled' : '' }}">
+                <a class="page-link" href="{{ $desas->url(1) }}">First</a>
+            </li>
+
+            {{-- Tombol Prev --}}
+            <li class="page-item {{ $desas->onFirstPage() ? 'disabled' : '' }}">
+                <a class="page-link" href="{{ $desas->previousPageUrl() ?? '#' }}" aria-label="Previous">«</a>
+            </li>
+
+            {{-- Nomor Halaman --}}
+            @foreach ($desas->getUrlRange(1, $desas->lastPage()) as $page => $url)
+                <li class="page-item {{ $page == $desas->currentPage() ? 'active' : '' }}">
+                    <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                </li>
+            @endforeach
+
+            {{-- Tombol Next --}}
+            <li class="page-item {{ !$desas->hasMorePages() ? 'disabled' : '' }}">
+                <a class="page-link" href="{{ $desas->nextPageUrl() ?? '#' }}" aria-label="Next">»</a>
+            </li>
+
+            {{-- Tombol Last --}}
+            <li class="page-item {{ !$desas->hasMorePages() ? 'disabled' : '' }}">
+                <a class="page-link" href="{{ $desas->url($desas->lastPage()) }}">Last</a>
+            </li>
+        </ul>
+    </nav>
+@endif
+
     </div>
 </div>
 @endsection

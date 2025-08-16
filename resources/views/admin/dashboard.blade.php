@@ -35,27 +35,15 @@
                 <canvas id="proposalChart" height="120"></canvas>
             </div>
 
-            {{-- Diagram Pie Kabupaten & Jenis Proposal Berdampingan --}}
-            <div class="mt-5">
-            <div class="row justify-content-center">
-
-                <div class="col-md-6 text-center">
-                    <h5>Proposal per Kabupaten</h5>
-                    <div style="max-width: 400px; margin: 0 auto;">
-                        <canvas id="pieKabupaten"></canvas>
-                    </div>
-                </div>
-
-                <div class="col-md-6 text-center">
+            {{-- Diagram Pie Jenis Proposal --}}
+            <div class="row mt-5">
+                <div class="col-md-6 offset-md-3 text-center">
                     <h5>Proposal per Jenis Proposal</h5>
                     <div style="max-width: 400px; margin: 0 auto;">
                         <canvas id="pieJenisProposal"></canvas>
                     </div>
                 </div>
-
-    </div>
-</div>
-
+            </div>
         </div>
     </div>
 </div>
@@ -64,12 +52,20 @@
 @section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Chart: Bar - Jumlah Proposal per Kabupaten
-    const ctxBar = document.getElementById('proposalChart').getContext('2d');
-    const labelsKabupaten  = {!! json_encode($labelsKabupaten) !!};
-    const dataProposal     = {!! json_encode($jumlahProposalPerKabupaten) !!};
+    // Data dari Controller
+    const labelsKabupaten = @json($labelsKabupaten);
+    const dataProposal = @json($jumlahProposalPerKabupaten);
+    const labelsJenis = @json($labelsJenisProposal);
+    const dataJenis = @json($jumlahPerJenisProposal);
 
-    new Chart(ctxBar, {
+    // Warna tetap untuk jenis proposal
+    const warnaTetapJenis = [
+        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+        '#FF9F40', '#00A36C', '#C71585', '#4682B4', '#FFD700'
+    ];
+
+    // Chart: Bar - Jumlah Proposal per Kabupaten
+    new Chart(document.getElementById('proposalChart'), {
         type: 'bar',
         data: {
             labels: labelsKabupaten,
@@ -83,58 +79,27 @@
         },
         options: {
             responsive: true,
-            plugins: {
-                legend: { display: false },
-                tooltip: { enabled: true }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    precision: 0,
-                    title: { display: true, text: 'Total Proposal' }
-                }
-            }
-        }
-    });
-
-    // Chart: Pie - Proposal per Kabupaten
-    const pieKabupatenCtx = document.getElementById('pieKabupaten').getContext('2d');
-    new Chart(pieKabupatenCtx, {
-        type: 'pie',
-        data: {
-            labels: labelsKabupaten,
-            datasets: [{
-                data: dataProposal,
-                backgroundColor: labelsKabupaten.map(() => `hsl(${Math.random() * 360}, 70%, 60%)`)
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { position: 'right' },
-                title: { display: true, text: 'Distribusi Proposal per Kabupaten' }
-            }
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, precision: 0 } }
         }
     });
 
     // Chart: Pie - Proposal per Jenis Proposal
-    const pieJenisCtx = document.getElementById('pieJenisProposal').getContext('2d');
-    const labelsJenis  = {!! json_encode($labelsJenisProposal) !!};
-    const dataJenis    = {!! json_encode($jumlahPerJenisProposal) !!};
-
-    new Chart(pieJenisCtx, {
+    new Chart(document.getElementById('pieJenisProposal'), {
         type: 'pie',
         data: {
             labels: labelsJenis,
             datasets: [{
                 data: dataJenis,
-                backgroundColor: labelsJenis.map(() => `hsl(${Math.random() * 360}, 70%, 60%)`)
+                backgroundColor: warnaTetapJenis.slice(0, labelsJenis.length),
+                borderColor: '#ffffff',
+                borderWidth: 2
             }]
         },
         options: {
             responsive: true,
             plugins: {
-                legend: { position: 'right' },
+                legend: { position: 'bottom' },
                 title: { display: true, text: 'Distribusi Proposal per Jenis Proposal' }
             }
         }

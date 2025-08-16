@@ -14,6 +14,7 @@ class KecamatanController extends Controller
     public function index()
     {
         $kecamatans = Kecamatan::with('kabupaten')->get();
+        $kecamatans = Kecamatan::paginate(5);
         $kabupatens = Kabupaten::all();
         return view('kecamatans.index', compact('kecamatans', 'kabupatens'));
     }

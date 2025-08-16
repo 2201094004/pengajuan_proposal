@@ -74,5 +74,14 @@ class Proposal extends Model
     // {
     //     return $this->belongsTo(JenisProposal::class);
     // }
+    public function verifier()
+    {
+        return $this->belongsTo(User::class, 'verified_by');
+    }
+
+    public function histories()
+    {
+        return $this->hasMany(ProposalHistory::class);
+    }
 
 }

@@ -14,6 +14,8 @@ class DesaController extends Controller
     public function index()
     {
         $desas = Desa::with('kecamatan.kabupaten')->get();
+
+        $desas = Desa::paginate(5);
         return view('desas.index', compact('desas'));
     }
 

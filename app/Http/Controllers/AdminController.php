@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Proposal;
 use App\Models\User;
 use App\Models\Kabupaten;
+use App\Models\ProposalHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
@@ -52,8 +53,10 @@ class AdminController extends Controller
     // Menampilkan daftar proposal dengan pencarian
     public function statusPengajuan(Request $request)
     {
-        $query = Proposal::query()->with(['kabupaten', 'kecamatan', 'desa', 'kabupatenTujuan', 'jenisProposal']);
+        // Query dasar dengan relasi
+        $query = Proposal::with(['kabupaten', 'kecamatan', 'desa', 'kabupatenTujuan', 'jenisProposal']);
 
+        // Filter pencarian
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -62,29 +65,30 @@ class AdminController extends Controller
             });
         }
 
+        // Filter kabupaten
         if ($request->filled('kabupaten_id')) {
             $query->where('kabupaten_id', $request->kabupaten_id);
         }
 
+        // Filter range waktu
         if ($request->filled('range')) {
             match ($request->range) {
-                'daily' => $query->whereDate('created_at', today()),
-                'weekly' => $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]),
+                'daily'   => $query->whereDate('created_at', today()),
+                'weekly'  => $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]),
                 'monthly' => $query->whereMonth('created_at', now()->month),
-                'yearly' => $query->whereYear('created_at', now()->year),
-                default => null,
+                'yearly'  => $query->whereYear('created_at', now()->year),
+                default   => null,
             };
         }
 
-        $proposals = $query->latest()->get();
-        $kabupatens = Kabupaten::orderBy('nama')->get();
-        // $kabupatens = Kabupaten::all();
+        // Ambil data dengan pagination
+        $proposals = $query->paginate(5);
 
-        // return view('admin.status-pengajuan', compact('proposals', 'kabupatens'));
-           return view('admin.status-pengajuan', [
-        'proposals' => $proposals,
-        'kabupatens' => $kabupatens,
-           ]);
+        // Ambil data kabupaten untuk filter dropdown
+        $kabupatens = Kabupaten::orderBy('nama')->get();
+
+        // Kirim data ke view
+        return view('admin.status-pengajuan', compact('proposals', 'kabupatens'));
     }
 
     // Menerima proposal
@@ -121,6 +125,7 @@ class AdminController extends Controller
     public function manageUsers()
     {
         $users = User::all();
+        $users = User::paginate(5);
         return view('admin.manage-users', compact('users'));
     }
 
@@ -207,4 +212,51 @@ class AdminController extends Controller
 
         return Excel::download(new FilteredProposalsExport($filteredProposals), 'data_proposal_' . $range . '.xlsx');
     }
+
+    public function accept($id)
+    {
+        $proposal = Proposal::findOrFail($id);
+        $proposal->status = 'accepted';
+        $proposal->verified_by = auth()->id();
+        $proposal->save();
+
+        return back()->with('success', 'Proposal diterima.');
+    }
+
+    public function reject($id)
+    {
+        $proposal = Proposal::findOrFail($id);
+        $proposal->status = 'rejected';
+        $proposal->verified_by = auth()->id();
+        $proposal->save();
+
+        return back()->with('success', 'Proposal ditolak.');
+    }
+
+    public function revision($id)
+    {
+        $proposal = Proposal::findOrFail($id);
+        $proposal->status = 'revised';
+        $proposal->verified_by = auth()->id();
+        $proposal->save();
+
+        return back()->with('success', 'Proposal dikembalikan untuk revisi.');
+    }
+
+    public function history($id)
+    {
+        $proposal = Proposal::with('histories.user')->findOrFail($id);
+        return view('admin.proposals.history', compact('proposal'));
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $proposal = Proposal::findOrFail($id);
+        $proposal->status = $request->status;   // Diterima / Ditolak / Revisi
+        $proposal->verifier_id = auth()->id();  // simpan user login yang verifikasi
+        $proposal->save();
+
+        return back()->with('success', 'Status berhasil diperbarui');
+    }
+
 }

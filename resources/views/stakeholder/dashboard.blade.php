@@ -38,12 +38,12 @@
             {{-- Diagram Pie --}}
             <div class="mt-5">
                 <div class="row justify-content-center">
-                    <div class="col-md-6 text-center">
+                    {{-- <div class="col-md-6 text-center">
                         <h5>Proposal per Kabupaten</h5>
                         <div style="max-width: 400px; margin: 0 auto;">
                             <canvas id="pieKabupaten"></canvas>
                         </div>
-                    </div>
+                    </div> --}}
 
                     <div class="col-md-6 text-center">
                         <h5>Proposal per Jenis Proposal</h5>
@@ -95,24 +95,24 @@
     });
 
     // Pie Chart: Proposal per Kabupaten
-    const pieKabupatenCtx = document.getElementById('pieKabupaten').getContext('2d');
-    new Chart(pieKabupatenCtx, {
-        type: 'pie',
-        data: {
-            labels: labelsKabupaten,
-            datasets: [{
-                data: dataProposal,
-                backgroundColor: labelsKabupaten.map(() => `hsl(${Math.random() * 360}, 70%, 60%)`)
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { position: 'right' },
-                title: { display: true, text: 'Distribusi Proposal per Kabupaten' }
-            }
-        }
-    });
+    // const pieKabupatenCtx = document.getElementById('pieKabupaten').getContext('2d');
+    // new Chart(pieKabupatenCtx, {
+    //     type: 'pie',
+    //     data: {
+    //         labels: labelsKabupaten,
+    //         datasets: [{
+    //             data: dataProposal,
+    //             backgroundColor: labelsKabupaten.map(() => `hsl(${Math.random() * 360}, 70%, 60%)`)
+    //         }]
+    //     },
+    //     options: {
+    //         responsive: true,
+    //         plugins: {
+    //             legend: { position: 'right' },
+    //             title: { display: true, text: 'Distribusi Proposal per Kabupaten' }
+    //         }
+    //     }
+    // });
 
     // Pie Chart: Proposal per Jenis Proposal
     const pieJenisCtx = document.getElementById('pieJenisProposal').getContext('2d');

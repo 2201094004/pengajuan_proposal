@@ -12,6 +12,7 @@
             <table id="proposalTable" class="table table-bordered table-hover align-middle text-center display nowrap" style="width:100%">
                 <thead class="table-light">
                     <tr>
+                        <th>No</th>
                         <th>Nama</th>
                         <th>Judul</th>
                         <th>Email</th>
@@ -29,6 +30,7 @@
                 <tbody>
                     @forelse($proposals as $proposal)
                         <tr>
+                            <td>{{ $proposals->firstItem() + $loop->index }}</td>
                             <td>{{ $proposal->nama }}</td>
                             <td>{{ $proposal->title }}</td>
                             <td>{{ $proposal->email }}</td>
@@ -71,7 +73,7 @@
                                 
                                 <form action="{{ route('proposals.destroy', $proposal->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus proposal ini?')">
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
+                                    {{-- <button type="submit" class="btn btn-danger btn-sm">Hapus</button> --}}
                                 </form>
                             </td>
                         </tr>
@@ -81,6 +83,38 @@
                 </tbody>
             </table>
         </div>
+         @if(method_exists($proposals, 'hasPages') && $proposals->hasPages())
+            <nav aria-label="Page navigation example" class="mt-3">
+                <ul class="pagination justify-content-center">
+                    {{-- Tombol First --}}
+                    <li class="page-item {{ $proposals->onFirstPage() ? 'disabled' : '' }}">
+                        <a class="page-link" href="{{ $proposals->url(1) }}">First</a>
+                    </li>
+
+                    {{-- Tombol Prev --}}
+                    <li class="page-item {{ $proposals->onFirstPage() ? 'disabled' : '' }}">
+                        <a class="page-link" href="{{ $proposals->previousPageUrl() ?? '#' }}" aria-label="Previous">«</a>
+                    </li>
+
+                    {{-- Nomor Halaman --}}
+                    @foreach ($proposals->getUrlRange(1, $proposals->lastPage()) as $page => $url)
+                        <li class="page-item {{ $page == $proposals->currentPage() ? 'active' : '' }}">
+                            <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                        </li>
+                    @endforeach
+
+                    {{-- Tombol Next --}}
+                    <li class="page-item {{ !$proposals->hasMorePages() ? 'disabled' : '' }}">
+                        <a class="page-link" href="{{ $proposals->nextPageUrl() ?? '#' }}" aria-label="Next">»</a>
+                    </li>
+
+                    {{-- Tombol Last --}}
+                    <li class="page-item {{ !$proposals->hasMorePages() ? 'disabled' : '' }}">
+                        <a class="page-link" href="{{ $proposals->url($proposals->lastPage()) }}">Last</a>
+                    </li>
+                </ul>
+            </nav>
+            @endif
     </div>
 </div>
 @endsection

@@ -74,6 +74,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::put('/users/{id}', [AdminController::class, 'updateUser'])->name('update-user');
     Route::delete('/users/{id}', [AdminController::class, 'deleteUser'])->name('delete-user');
     Route::get('/admin/list-user', [AdminController::class, 'index'])->name('admin.list-user');
+    Route::get('/admin/proposals/{id}/history', [AdminController::class, 'history'])->name('admin.proposals.history');
 
     // Jenis Proposal
     Route::resource('jenis_proposals', JenisProposalController::class); // admin.jenis_proposals.*

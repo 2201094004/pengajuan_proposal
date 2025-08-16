@@ -46,6 +46,11 @@ return new class extends Migration
 
             // Relasi ke users
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+
+           // migration add_verified_by_to_proposals
+            $table->unsignedBigInteger('verified_by')->nullable();
+            $table->foreign('verified_by')->references('id')->on('users')->onDelete('set null');
+
         });
     }
 

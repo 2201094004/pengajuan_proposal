@@ -28,6 +28,7 @@ class ProposalController extends Controller
                      ->where('user_id', auth()->id())
                      ->get();
 
+        $proposals = Proposal::paginate(5);
         return view('proposals.index', compact('proposals'));
     }
 
@@ -251,4 +252,5 @@ class ProposalController extends Controller
         return redirect()->route('admin.status-pengajuan')->with('success', 'Penilaian berhasil disimpan.');
     }
 
+    
 }

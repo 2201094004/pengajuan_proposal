@@ -10,6 +10,8 @@ class JenisProposalController extends Controller
     public function index()
     {
         $jenisProposals = JenisProposal::all();
+
+        $jenisProposals = JenisProposal::paginate(5);
         return view('jenis_proposals.index', compact('jenisProposals'));
     }
 

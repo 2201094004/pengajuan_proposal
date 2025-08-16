@@ -12,12 +12,15 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Custom CSS -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+
     <style>
         body {
             background: linear-gradient(to right, #ffffff, #ffffff);
-            color: #fff;
         }
         .navbar {
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
@@ -35,56 +38,76 @@
             gap: 10px;
         }
         .sidebar a.active, .sidebar a:hover {
-            background: #2575fc;
+            background: #2d8dc5;
             color: #fff;
         }
     </style>
 </head>
 <body>
-    <div id="app">
-        <!-- Top Bar -->
-        @include('partials.topbar')
+<div id="app">
+    <!-- Top Bar -->
+    @include('partials.topbar')
 
-        <div class="d-flex">
-            <!-- Sidebar -->
-            @include('partials.sidebar')
+    <div class="d-flex">
+        <!-- Sidebar -->
+        @include('partials.sidebar')
 
-            <!-- Main Content -->
-            <div class="container-fluid p-4" style="flex-grow: 1;">
-                @yield('content')
-            </div>
+        <!-- Main Content -->
+        <div class="container-fluid p-4" style="flex-grow: 1;">
+            @yield('content')
         </div>
     </div>
+</div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    @yield('scripts')
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- jQuery & DataTables JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 
-    <script>
-        @if(session('success'))
-            Swal.fire({
-                icon: 'success',
-                title: 'Berhasil!',
-                text: '{{ session('success') }}',
-                timer: 2500,
-                showConfirmButton: false,
-                timerProgressBar: true,
-            });
-        @endif
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-        @if(session('error'))
-            Swal.fire({
-                icon: 'error',
-                title: 'Gagal!',
-                text: '{{ session('error') }}',
-                timer: 2500,
-                showConfirmButton: false,
-                timerProgressBar: true,
-            });
-        @endif
-    </script>
+<script>
+    $(document).ready(function () {
+        $('.datatable').DataTable({
+            paging: false,   // biar pagination Laravel yang jalan
+            info: false,     // hilangin "Showing X of Y"
+            searching: true, // search aktif
+            ordering: true,  // sorting aktif
+            responsive: true,
+            language: {
+                search: "Cari:",
+                zeroRecords: "Data tidak ditemukan",
+            }
+        });
+    });
+
+    // SweetAlert Notifikasi
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: '{{ session('success') }}',
+            timer: 2500,
+            showConfirmButton: false,
+            timerProgressBar: true,
+        });
+    @endif
+
+    @if(session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal!',
+            text: '{{ session('error') }}',
+            timer: 2500,
+            showConfirmButton: false,
+            timerProgressBar: true,
+        });
+    @endif
+</script>
+
+@yield('scripts')
 </body>
 </html>

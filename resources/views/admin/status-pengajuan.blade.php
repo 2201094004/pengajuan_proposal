@@ -62,6 +62,7 @@
                 <table class="table table-bordered table-hover align-middle text-center">
                     <thead class="table-light">
                         <tr>
+                            <th>No</th>
                             <th>Nama</th>
                             <th>Judul</th>
                             <th>Email</th>
@@ -72,13 +73,19 @@
                             <th>Tujuan Kabupaten</th>
                             <th>Jenis Proposal</th>
                             <th>Status</th>
+                            {{-- <th>Diverifikasi Oleh</th> tambahan --}}
                             <th>Dokumen</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($proposals as $proposal)
+                        @forelse($proposals as $index => $proposal)
                             <tr>
+                                {{-- Nomor urut --}}
+                                <td>
+                                    {{ method_exists($proposals, 'firstItem') ? $proposals->firstItem() + $index : $loop->iteration }}
+                                </td>
+
                                 <td>{{ $proposal->nama }}</td>
                                 <td>{{ $proposal->title }}</td>
                                 <td>{{ $proposal->email }}</td>
@@ -101,6 +108,9 @@
                                         @default           <span class="badge bg-secondary">-</span>
                                     @endswitch
                                 </td>
+                                {{-- <td>
+                                    {{ optional($proposal->verifier)->name ?? '-' }}
+                                </td> --}}
                                 <td>
                                     @if($proposal->proposal_file)
                                         <a href="{{ asset('storage/documents/'.$proposal->proposal_file) }}" target="_blank" class="btn btn-sm btn-outline-secondary">
@@ -135,14 +145,48 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="12" class="text-center text-muted">Belum ada pengajuan proposal.</td>
+                                <td colspan="14" class="text-center text-muted">Belum ada pengajuan proposal.</td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
-        </div>
 
+            {{-- PAGINATION --}}
+            @if(method_exists($proposals, 'hasPages') && $proposals->hasPages())
+            <nav aria-label="Page navigation example" class="mt-3">
+                <ul class="pagination justify-content-center">
+                    {{-- Tombol First --}}
+                    <li class="page-item {{ $proposals->onFirstPage() ? 'disabled' : '' }}">
+                        <a class="page-link" href="{{ $proposals->url(1) }}">First</a>
+                    </li>
+
+                    {{-- Tombol Prev --}}
+                    <li class="page-item {{ $proposals->onFirstPage() ? 'disabled' : '' }}">
+                        <a class="page-link" href="{{ $proposals->previousPageUrl() ?? '#' }}" aria-label="Previous">«</a>
+                    </li>
+
+                    {{-- Nomor Halaman --}}
+                    @foreach ($proposals->getUrlRange(1, $proposals->lastPage()) as $page => $url)
+                        <li class="page-item {{ $page == $proposals->currentPage() ? 'active' : '' }}">
+                            <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                        </li>
+                    @endforeach
+
+                    {{-- Tombol Next --}}
+                    <li class="page-item {{ !$proposals->hasMorePages() ? 'disabled' : '' }}">
+                        <a class="page-link" href="{{ $proposals->nextPageUrl() ?? '#' }}" aria-label="Next">»</a>
+                    </li>
+
+                    {{-- Tombol Last --}}
+                    <li class="page-item {{ !$proposals->hasMorePages() ? 'disabled' : '' }}">
+                        <a class="page-link" href="{{ $proposals->url($proposals->lastPage()) }}">Last</a>
+                    </li>
+                </ul>
+            </nav>
+            @endif
+
+        </div>
     </div>
 </div>
 @endsection

@@ -12,7 +12,7 @@
             <table class="table table-hover table-bordered align-middle">
                 <thead class="table-light text-center">
                     <tr>
-                        <th>#</th>
+                        <th>No</th>
                         <th>Nama Kecamatan</th>
                         <th>Kabupaten</th>
                         <th style="width: 150px;">Aksi</th>
@@ -41,6 +41,39 @@
                 </tbody>
             </table>
         </div>
+         @if(method_exists($kecamatans, 'hasPages') && $kecamatans->hasPages())
+    <nav aria-label="Page navigation example" class="mt-3">
+        <ul class="pagination justify-content-center">
+            {{-- Tombol First --}}
+            <li class="page-item {{ $kecamatans->onFirstPage() ? 'disabled' : '' }}">
+                <a class="page-link" href="{{ $kecamatans->url(1) }}">First</a>
+            </li>
+
+            {{-- Tombol Prev --}}
+            <li class="page-item {{ $kecamatans->onFirstPage() ? 'disabled' : '' }}">
+                <a class="page-link" href="{{ $kecamatans->previousPageUrl() ?? '#' }}" aria-label="Previous">«</a>
+            </li>
+
+            {{-- Nomor Halaman --}}
+            @foreach ($kecamatans->getUrlRange(1, $kecamatans->lastPage()) as $page => $url)
+                <li class="page-item {{ $page == $kecamatans->currentPage() ? 'active' : '' }}">
+                    <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                </li>
+            @endforeach
+
+            {{-- Tombol Next --}}
+            <li class="page-item {{ !$kecamatans->hasMorePages() ? 'disabled' : '' }}">
+                <a class="page-link" href="{{ $kecamatans->nextPageUrl() ?? '#' }}" aria-label="Next">»</a>
+            </li>
+
+            {{-- Tombol Last --}}
+            <li class="page-item {{ !$kecamatans->hasMorePages() ? 'disabled' : '' }}">
+                <a class="page-link" href="{{ $kecamatans->url($kecamatans->lastPage()) }}">Last</a>
+            </li>
+        </ul>
+    </nav>
+@endif
+
     </div>
 </div>
 @endsection

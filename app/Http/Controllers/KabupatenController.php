@@ -12,7 +12,8 @@ class KabupatenController extends Controller
      */
     public function index()
     {
-        $kabupatens = Kabupaten::all();
+        $kabupatens = Kabupaten::paginate(5);
+
         return view('kabupatens.index', compact('kabupatens'));
     }
 
