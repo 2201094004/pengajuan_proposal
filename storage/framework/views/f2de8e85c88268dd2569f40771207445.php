@@ -72,7 +72,7 @@
                             <th>Tujuan Kabupaten</th>
                             <th>Jenis Proposal</th>
                             <th>Status</th>
-                            
+                            <th>Diverifikasi Oleh</th> 
                             <th>Dokumen</th>
                             <th>Aksi</th>
                         </tr>
@@ -108,7 +108,21 @@
                                         <?php default: ?>           <span class="badge bg-secondary">-</span>
                                     <?php endswitch; ?>
                                 </td>
-                                
+                                <td>
+                                    <?php if($proposal->verifier): ?>
+                                        <?php if($proposal->verifier->role == 'admin'): ?>
+                                            Admin
+                                        <?php elseif($proposal->verifier->role == 'stakeholder'): ?>
+                                            Stakeholder <?php echo e(optional($proposal->verifier->kabupaten)->nama ?? '-'); ?>
+
+                                        <?php else: ?>
+                                            <?php echo e($proposal->verifier->name); ?>
+
+                                        <?php endif; ?>
+                                    <?php else: ?>
+                                        <span class="text-muted">Belum diverifikasi</span>
+                                    <?php endif; ?>
+                                </td>
                                 <td>
                                     <?php if($proposal->proposal_file): ?>
                                         <a href="<?php echo e(asset('storage/documents/'.$proposal->proposal_file)); ?>" target="_blank" class="btn btn-sm btn-outline-secondary">
@@ -132,10 +146,7 @@
                                             <?php echo csrf_field(); ?>
                                             <button class="btn btn-sm btn-danger">× Tolak</button>
                                         </form>
-                                        <form action="<?php echo e(route('admin.proposal.revision', $proposal->id)); ?>" method="POST" class="d-inline">
-                                            <?php echo csrf_field(); ?>
-                                            <button class="btn btn-sm btn-warning">↺ Revisi</button>
-                                        </form>
+                                        
                                     <?php else: ?>
                                         <span class="text-muted">-</span>
                                     <?php endif; ?>

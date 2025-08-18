@@ -89,26 +89,6 @@
         }
     });
 
-    // Pie Chart: Proposal per Kabupaten
-    // const pieKabupatenCtx = document.getElementById('pieKabupaten').getContext('2d');
-    // new Chart(pieKabupatenCtx, {
-    //     type: 'pie',
-    //     data: {
-    //         labels: labelsKabupaten,
-    //         datasets: [{
-    //             data: dataProposal,
-    //             backgroundColor: labelsKabupaten.map(() => `hsl(${Math.random() * 360}, 70%, 60%)`)
-    //         }]
-    //     },
-    //     options: {
-    //         responsive: true,
-    //         plugins: {
-    //             legend: { position: 'right' },
-    //             title: { display: true, text: 'Distribusi Proposal per Kabupaten' }
-    //         }
-    //     }
-    // });
-
     // Pie Chart: Proposal per Jenis Proposal
     const pieJenisCtx = document.getElementById('pieJenisProposal').getContext('2d');
     const labelsJenis  = <?php echo json_encode($labelsJenisProposal); ?>;

@@ -96,6 +96,7 @@ class AdminController extends Controller
     {
         $proposal = Proposal::findOrFail($id);
         $proposal->status = 'accepted';
+        $proposal->verified_by = auth()->id();
         $proposal->save();
 
         return redirect()->route('admin.status-pengajuan')->with('success', 'Proposal berhasil diterima.');
@@ -106,6 +107,7 @@ class AdminController extends Controller
     {
         $proposal = Proposal::findOrFail($id);
         $proposal->status = 'rejected';
+        $proposal->verified_by = auth()->id();
         $proposal->save();
 
         return redirect()->route('admin.status-pengajuan')->with('success', 'Proposal berhasil ditolak.');
@@ -116,6 +118,7 @@ class AdminController extends Controller
     {
         $proposal = Proposal::findOrFail($id);
         $proposal->status = 'revised';
+        $proposal->verified_by = auth()->id();
         $proposal->save();
 
         return redirect()->route('admin.status-pengajuan')->with('success', 'Proposal ditandai untuk revisi.');
@@ -253,7 +256,7 @@ class AdminController extends Controller
     {
         $proposal = Proposal::findOrFail($id);
         $proposal->status = $request->status;   // Diterima / Ditolak / Revisi
-        $proposal->verifier_id = auth()->id();  // simpan user login yang verifikasi
+        $proposal->verified_by = auth()->id();  // simpan user login yang verifikasi
         $proposal->save();
 
         return back()->with('success', 'Status berhasil diperbarui');

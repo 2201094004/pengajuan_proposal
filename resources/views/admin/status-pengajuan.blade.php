@@ -73,7 +73,7 @@
                             <th>Tujuan Kabupaten</th>
                             <th>Jenis Proposal</th>
                             <th>Status</th>
-                            {{-- <th>Diverifikasi Oleh</th> tambahan --}}
+                            <th>Diverifikasi Oleh</th> 
                             <th>Dokumen</th>
                             <th>Aksi</th>
                         </tr>
@@ -108,9 +108,19 @@
                                         @default           <span class="badge bg-secondary">-</span>
                                     @endswitch
                                 </td>
-                                {{-- <td>
-                                    {{ optional($proposal->verifier)->name ?? '-' }}
-                                </td> --}}
+                                <td>
+                                    @if($proposal->verifier)
+                                        @if($proposal->verifier->role == 'admin')
+                                            Admin
+                                        @elseif($proposal->verifier->role == 'stakeholder')
+                                            Stakeholder {{ optional($proposal->verifier->kabupaten)->nama ?? '-' }}
+                                        @else
+                                            {{ $proposal->verifier->name }}
+                                        @endif
+                                    @else
+                                        <span class="text-muted">Belum diverifikasi</span>
+                                    @endif
+                                </td>
                                 <td>
                                     @if($proposal->proposal_file)
                                         <a href="{{ asset('storage/documents/'.$proposal->proposal_file) }}" target="_blank" class="btn btn-sm btn-outline-secondary">
@@ -134,10 +144,10 @@
                                             @csrf
                                             <button class="btn btn-sm btn-danger">× Tolak</button>
                                         </form>
-                                        <form action="{{ route('admin.proposal.revision', $proposal->id) }}" method="POST" class="d-inline">
+                                        {{-- <form action="{{ route('admin.proposal.revision', $proposal->id) }}" method="POST" class="d-inline">
                                             @csrf
                                             <button class="btn btn-sm btn-warning">↺ Revisi</button>
-                                        </form>
+                                        </form> --}}
                                     @else
                                         <span class="text-muted">-</span>
                                     @endif

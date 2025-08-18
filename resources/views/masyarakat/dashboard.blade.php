@@ -14,11 +14,24 @@
         </div>
     </div>
 
-    <div class="card shadow-sm" data-aos="fade-up">
-        <div class="card-header bg-secondary text-white">
+   <div class="card shadow-sm" data-aos="fade-up">
+        <div class="card-header text-white" style="background: #64748b;">
             <h5 class="mb-0">Tata Cara Pengisian Proposal</h5>
         </div>
         <div class="card-body">
+            <h6>Download Template Proposal:</h6>
+            <ul>
+                <li><a href="{{ asset('storage/docs/proposal_bantuan_pendidikan.docx') }}" download class="text-primary fw-bold">📄 Template Bantuan Pendidikan</a></li>
+                <li><a href="{{ asset('storage/docs/proposal_bantuan_sarana_dan_prasarana.docx') }}" download class="text-primary fw-bold">📄 Template Bantuan Sarana & Prasarana</a></li>
+                <li><a href="{{ asset('storage/docs/proposal_bantuan_kesehatan.docx') }}" download class="text-primary fw-bold">📄 Template Bantuan Kesehatan</a></li>
+                <li><a href="{{ asset('storage/docs/proposal_bantuan_sosial.docx') }}" download class="text-primary fw-bold">📄 Template Bantuan Sosial</a></li>
+                <li><a href="{{ asset('storage/docs/proposal_bantuan_keagamaan.docx') }}" download class="text-primary fw-bold">📄 Template Bantuan Keagamaan</a></li>
+                <li><a href="{{ asset('storage/docs/proposal_bantuan_infrastruktur.docx') }}" download class="text-primary fw-bold">📄 Template Bantuan Infrastruktur</a></li>
+                <li><a href="{{ asset('storage/docs/proposal_bantuan_ekonomi_umkm.docx') }}" download class="text-primary fw-bold">📄 Template Bantuan Ekonomi/UMKM</a></li>
+            </ul>
+        </div>
+
+        <div class="card-body bg-light">
             <ul class="list-group list-group-flush">
                 <li class="list-group-item"><strong>Nama:</strong> Isi dengan nama lengkap pengaju proposal.</li>
                 <li class="list-group-item"><strong>Judul:</strong> Tulis judul kegiatan atau bantuan yang diajukan.</li>
@@ -32,5 +45,6 @@
             </ul>
         </div>
     </div>
+
 </div>
 @endsection

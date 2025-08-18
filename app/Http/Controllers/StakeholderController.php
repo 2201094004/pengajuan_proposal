@@ -6,13 +6,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Proposal;
 use App\Models\Kabupaten;
-use App\Models\JenisProposal;
 
 class StakeholderController extends Controller
 {
+    // Dashboard Stakeholder
     public function dashboard()
     {
-        // Status statistik
+        // Statistik status
         $totalDiterima = Proposal::where('status', 'accepted')->count();
         $totalDitolak  = Proposal::where('status', 'rejected')->count();
         $totalRevisi   = Proposal::where('status', 'revised')->count();
@@ -20,7 +20,7 @@ class StakeholderController extends Controller
         // Statistik per Kabupaten
         $dataPerKabupaten = Proposal::select('kabupaten_id', DB::raw('count(*) as total'))
             ->groupBy('kabupaten_id')
-            ->with('kabupaten') // relasi harus ada di model Proposal
+            ->with('kabupaten')
             ->get();
 
         $labelsKabupaten = $dataPerKabupaten->pluck('kabupaten.nama')->toArray();
@@ -29,7 +29,7 @@ class StakeholderController extends Controller
         // Statistik per Jenis Proposal
         $dataPerJenisProposal = Proposal::select('jenis_proposal_id', DB::raw('count(*) as total'))
             ->groupBy('jenis_proposal_id')
-            ->with('jenisProposal') // relasi harus ada di model Proposal
+            ->with('jenisProposal')
             ->get();
 
         $labelsJenisProposal = $dataPerJenisProposal->pluck('jenisProposal.nama')->toArray();
@@ -46,30 +46,32 @@ class StakeholderController extends Controller
         ));
     }
 
+    // Daftar status pengajuan (versi Stakeholder)
     public function statusPengajuan(Request $request)
     {
-        $query = Proposal::query();
+        $query = Proposal::with(['kabupaten', 'kecamatan', 'desa', 'kabupatenTujuan', 'jenisProposal']);
 
         // Filter kabupaten
         if ($request->filled('kabupaten_id')) {
             $query->where('kabupaten_id', $request->kabupaten_id);
         }
 
-        // Filter rentang waktu
+        // Filter range tanggal
         if ($request->filled(['start_date', 'end_date'])) {
             $query->whereBetween('created_at', [$request->start_date, $request->end_date]);
         }
 
-        $proposals = $query->get();
-        $kabupatens = Kabupaten::all();
+        // Pagination biar konsisten
+        $proposals = $query->paginate(5);
+        $kabupatens = Kabupaten::orderBy('nama')->get();
 
         return view('admin.status-pengajuan', compact('proposals', 'kabupatens'));
     }
 
+    // Semua proposal (untuk daftar umum)
     public function semuaProposal()
     {
-        $proposals = Proposal::with(['kabupaten', 'jenisProposal'])->latest()->get();
+        $proposals = Proposal::with(['kabupaten', 'jenisProposal'])->latest()->paginate(10);
         return view('proposals.index', compact('proposals'));
     }
-
 }
